@@ -34,6 +34,7 @@
     github-mcp = ./servers/github-mcp.nix;
     git-intel-mcp = ./servers/git-intel-mcp.nix;
     git-mcp = ./servers/git-mcp.nix;
+    kagi-mcp = ./servers/kagi-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
   };
 

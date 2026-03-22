@@ -47,6 +47,22 @@
       sha256 = "sha256-BD/t3UBAvrzJpRI7b06FjE8c+vzdQiXsj6eiUGQX6uA=";
     };
   };
+  kagiapi = {
+    pname = "kagiapi";
+    version = "0.2.1";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/k/kagiapi/kagiapi-0.2.1.tar.gz";
+      sha256 = "sha256-NV/kB7TGg9bwhIJ+T4VP2VE03yhC8V0Inaz/Yg4/Sus=";
+    };
+  };
+  kagimcp = {
+    pname = "kagimcp";
+    version = "0.1.4";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/k/kagimcp/kagimcp-0.1.4.tar.gz";
+      sha256 = "sha256-fCFmd6BKyyeggekFsJtno394ZeswTYSRELryHQQAcyY=";
+    };
+  };
   mcp-server-fetch = {
     pname = "mcp-server-fetch";
     version = "2025.4.7";
