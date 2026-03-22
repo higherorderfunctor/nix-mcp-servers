@@ -92,7 +92,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
 | npm            | context7-mcp, git-intel-mcp                                          | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
 | Script         | effect-mcp                                                           | `stdenv.mkDerivation` or `writeShellApplication`                |
-| Python         | fetch-mcp                                                            | `python313Packages.buildPythonApplication` with pyproject       |
+| Python         | fetch-mcp, git-mcp                                                   | `python313Packages.buildPythonApplication` with pyproject       |
 
 ### Server Reference
 
@@ -108,6 +108,8 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | fetch-mcp | [PyPI](https://pypi.org/project/mcp-server-fetch/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | remote | runtime |
 
 | git-intel-mcp | [GitHub](https://github.com/hoangsonww/GitIntel-MCP-Server) | master HEAD | `buildNpmPackage` | stdio | local | runtime |
+
+| git-mcp | [PyPI](https://pypi.org/project/mcp-server-git/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | local | runtime |
 
 ### Updating Tool Lists
 

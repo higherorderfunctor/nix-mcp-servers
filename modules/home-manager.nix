@@ -32,6 +32,7 @@
     effect-mcp = ./servers/effect-mcp.nix;
     fetch-mcp = ./servers/fetch-mcp.nix;
     git-intel-mcp = ./servers/git-intel-mcp.nix;
+    git-mcp = ./servers/git-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
   };
 
