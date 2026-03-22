@@ -189,6 +189,8 @@ in
 
 | [sequential-thinking-mcp](https://github.com/modelcontextprotocol/servers) | Sequential thinking | stdio |
 
+| [sympy-mcp](https://github.com/sdiehl/sympy-mcp) | SymPy math | stdio |
+
 All binaries use a unified interface:
 
 ```sh

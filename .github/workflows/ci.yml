@@ -35,9 +35,10 @@ jobs:
           - git-mcp
           - github-mcp
           - kagi-mcp
+          - nixos-mcp
           - openmemory-mcp
           - sequential-thinking-mcp
-          - nixos-mcp
+          - sympy-mcp
     steps:
       - uses: actions/checkout@v6
       - uses: DeterminateSystems/nix-installer-action@main

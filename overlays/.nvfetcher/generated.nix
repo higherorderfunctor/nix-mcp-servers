@@ -95,4 +95,16 @@
       sha256 = "sha256-WiHm+kc3IrjmIqm7vdcrxtvN30MPJqtZic0z3+XcdwM=";
     };
   };
+  sympy-mcp = {
+    pname = "sympy-mcp";
+    version = "646c69558b622ab0e2814c58aa82143e56b76c33";
+    src = fetchFromGitHub {
+      owner = "sdiehl";
+      repo = "sympy-mcp";
+      rev = "646c69558b622ab0e2814c58aa82143e56b76c33";
+      fetchSubmodules = false;
+      sha256 = "sha256-AjRdiBtsF/ZpAUt+TPhvkT8VQ3y7rcJSogSSyQQXytI=";
+    };
+    date = "2026-03-18";
+  };
 }
