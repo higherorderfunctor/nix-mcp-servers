@@ -51,9 +51,10 @@
     in {
       formatting =
         pkgs.runCommand "check-formatting" {
-          nativeBuildInputs = [pkgs.alejandra];
+          nativeBuildInputs = [pkgs.alejandra pkgs.shfmt];
         } ''
           alejandra --check --exclude ${self}/overlays/.nvfetcher ${self} 2>/dev/null
+          shfmt -d -i 0 -ci ${self}/apps/*.sh
           touch $out
         '';
 
@@ -72,7 +73,31 @@
           statix check ${self} --ignore overlays/.nvfetcher
           touch $out
         '';
+
+      shellcheck =
+        pkgs.runCommand "check-shellcheck" {
+          nativeBuildInputs = [pkgs.shellcheck];
+        } ''
+          shellcheck ${self}/apps/*.sh
+          touch $out
+        '';
+
+      shellharden =
+        pkgs.runCommand "check-shellharden" {
+          nativeBuildInputs = [pkgs.shellharden];
+        } ''
+          shellharden --check ${self}/apps/*.sh
+          touch $out
+        '';
     });
+
+    apps = forAllSystems (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [inputs.nvfetcher.overlays.default];
+      };
+    in
+      import ./apps {inherit pkgs;});
 
     formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
   };

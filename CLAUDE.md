@@ -11,6 +11,8 @@ nix-mcp-servers is a Nix flake that packages Model Context Protocol (MCP) server
 ```bash
 nix flake show                # List all outputs (quick validation)
 nix develop                   # Enter devShell with all packages available
+nix run .#update              # Full update pipeline: flake inputs, nvfetcher, locks, hashes
+nix fmt                       # Format all Nix files with alejandra
 ```
 
 ## Architecture
@@ -103,3 +105,7 @@ Choose the tracking source for each server based on how the upstream project rel
 | PyPI / npm latest  | Upstream publishes releases to the registry promptly                 | `src.pypi` or `src.cmd` with registry URL          |
 
 Consumers pin versions via their own `flake.lock`. Per-package version overrides are always possible through the overlay system.
+
+### Update App (`nix run .#update`)
+
+Defined in `apps/update.nix` wrapping `apps/update.sh` via `writeShellApplication` with all runtime dependencies. Runs 6 steps: (1) `nix flake update`, (2) `nvfetcher` to refresh versions, (3) regenerate npm lock files, (4) update `npmDepsHash` values via `prefetch-npm-deps`, (5) update Go `vendorHash`, (6) verify with `nix flake show`.
