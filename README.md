@@ -27,7 +27,7 @@ Issues and PRs for new servers are welcome.
 
 ### Development
 
-Enter the dev shell for all tools (linters, formatters, LSPs):
+Enter the dev shell for all tools (linters, formatters, LSPs, nvfetcher):
 
 ```sh
 nix develop

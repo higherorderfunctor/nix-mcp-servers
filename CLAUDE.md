@@ -37,6 +37,7 @@ Current tech stack examples (update when new stacks are added):
 
 ### Nix
 
+Overlay functions accessing nvfetcher sources must go through `final.nv-sources.<key>` — never import `generated.nix` directly. Computed hashes (`npmDepsHash`, `vendorHash`) belong in the `overlays/hashes.json` sidecar, not inline in overlay files.
 
 ### Bash
 
@@ -78,3 +79,24 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/). 
 - `fix(update): correct npmDepsHash prefetch step`
 - `chore: update flake inputs and nvfetcher sources`
 - `docs: update CLAUDE.md with conventional commits guide`
+
+### Version Tracking
+
+- **nvfetcher.toml** — Defines upstream sources (PyPI, npm registry, GitHub) for each package.
+- **overlays/.nvfetcher/generated.nix** — Auto-generated Nix expressions with fetchers (managed by `nvfetcher`, do not edit).
+- **overlays/.nvfetcher/generated.json** — Raw JSON metadata (managed by `nvfetcher`, do not edit).
+- **overlays/sources.nix** — Overlay that calls `generated.nix` with fetchers and merges sidecar hashes, exposing `final.nv-sources.<name>`.
+- **overlays/hashes.json** — Sidecar file for computed hashes (`npmDepsHash`, `vendorHash`) managed by the update script.
+
+### Upstream Version Strategy
+
+Choose the tracking source for each server based on how the upstream project releases:
+
+| Source type        | When to use                                                          | nvfetcher config                                   |
+| ------------------ | -------------------------------------------------------------------- | -------------------------------------------------- |
+| Flake input        | Upstream is a Nix flake                                              | Add to `flake.nix` inputs, track main              |
+| GitHub main/master | No releases, or releases lag significantly behind active development | `src.git` + `src.use_commit = true` + `src.branch` |
+| GitHub releases    | Upstream tags releases regularly                                     | `src.github` (tracks latest tag)                   |
+| PyPI / npm latest  | Upstream publishes releases to the registry promptly                 | `src.pypi` or `src.cmd` with registry URL          |
+
+Consumers pin versions via their own `flake.lock`. Per-package version overrides are always possible through the overlay system.
