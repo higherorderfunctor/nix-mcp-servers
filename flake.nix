@@ -3,13 +3,17 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nvfetcher = {
+      url = "github:berberman/nvfetcher";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     self,
     nixpkgs,
     ...
-  }: let
+  } @ inputs: let
     forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
   in {
     overlays.default = _: _: {};
@@ -35,6 +39,9 @@
           pkgs.marksman
           pkgs.nixd
           pkgs.taplo
+
+          # Version tracking
+          inputs.nvfetcher.packages.${system}.default
         ];
       };
     });

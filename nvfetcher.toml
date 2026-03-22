@@ -1,0 +1,3 @@
+# MCP server source definitions for nvfetcher.
+# Each entry tracks an upstream package version.
+# Run `nvfetcher -c nvfetcher.toml -o overlays/.nvfetcher` to regenerate.
