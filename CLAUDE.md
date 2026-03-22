@@ -24,6 +24,10 @@ nix fmt                       # Format all Nix files with alejandra
 - **overlays/sources.nix** — Overlay that exposes `final.nv-sources.<name>` from nvfetcher's `generated.nix` merged with `hashes.json`.
 - **overlays/mk-mcp-wrapper.nix** — Shared wrapper that gives every server a uniform `--stdio` / `--http` CLI.
 
+### mkMcpWrapper
+
+`overlays/mk-mcp-wrapper.nix` exports a function `{ name, pkg, modes }` where `modes = { stdio = "cmd" or null; http = "cmd" or null; }` (at least one must be non-null). It produces a `writeShellApplication` that dispatches `--stdio`/`--http` flags to the underlying binary. All exported packages go through this wrapper.
+
 ## Code Quality
 
 ### Alphabetical Ordering
@@ -36,7 +40,7 @@ Never duplicate logic, configuration, or patterns. When the same thing appears t
 
 Current tech stack examples (update when new stacks are added):
 
-- **Nix:** repeated attribute patterns → shared function or `let` binding. Common overlay/module patterns → parameterized helper.
+- **Nix:** repeated attribute patterns → shared function or `let` binding. Common overlay/module patterns → parameterized helper (e.g., `mkMcpWrapper`).
 - **Bash:** repeated command sequences → function within the script, or a shared library script for cross-script reuse.
 - **Config/flags:** linter invocations, tool flags, etc. must be defined in one place and consumed by all callers. When adding or changing, update the single source of truth — not each consumer independently.
 
@@ -83,6 +87,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/). 
 - `feat(kagi-mcp): add kagi MCP server package`
 - `fix(update): correct npmDepsHash prefetch step`
 - `chore: update flake inputs and nvfetcher sources`
+- `refactor(wrapper): simplify mkMcpWrapper dispatch logic`
 - `docs: update CLAUDE.md with conventional commits guide`
 
 ### Version Tracking
