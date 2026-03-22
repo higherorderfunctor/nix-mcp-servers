@@ -6,6 +6,7 @@
     ./context7-mcp.nix
     ./effect-mcp.nix
     ./fetch-mcp.nix
+    ./git-intel-mcp.nix
     ./nixos-mcp.nix
   ];
 in

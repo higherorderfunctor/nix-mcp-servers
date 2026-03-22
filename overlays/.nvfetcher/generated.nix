@@ -22,6 +22,20 @@
       sha256 = "sha256-k36Ucri8CAw+xwVVKt58jwkjNlBF79KgHYr9v2lRvk8=";
     };
   };
+  git-intel-mcp = {
+    pname = "git-intel-mcp";
+    version = "9f216bab8d6bc3a3b850ad77f27d02d63a71e10d";
+    src = fetchgit {
+      url = "https://github.com/hoangsonww/GitIntel-MCP-Server.git";
+      rev = "9f216bab8d6bc3a3b850ad77f27d02d63a71e10d";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sparseCheckout = [ ];
+      sha256 = "sha256-UCIUmU6slN9EjL8Bf2JKfvyoVKE0jgUsfLd8OocdwNc=";
+    };
+    date = "2026-03-18";
+  };
   mcp-server-fetch = {
     pname = "mcp-server-fetch";
     version = "2025.4.7";
