@@ -60,8 +60,33 @@ Enter the dev shell for all tools (linters, formatters, LSPs, nvfetcher):
 nix develop
 ```
 
+Check for tool drift (detects added/removed tools in upstream servers):
+
+```sh
+nix run .#check-drift
+```
+
 Run all linting and evaluation checks:
 
 ```sh
 nix flake check
+```
+
+### Agentic workflows
+
+The repo is set up for AI-assisted maintenance using [GitHub Copilot CLI](https://github.com/features/copilot/cli) or [Claude Code](https://claude.ai/code). Both can read `CLAUDE.md` for project conventions.
+
+To autofix a drift report locally:
+
+```sh
+# Run drift detection (logs visible on stderr, JSON report saved)
+nix run .#check-drift > >(tee /tmp/drift-report.json) 2> >(tee /tmp/drift-log.txt >&2)
+
+# Feed to Copilot CLI (with Claude model) to fix
+gh copilot --model claude-sonnet-4.6
+# Then: "Fix the tool drift in /tmp/drift-report.json per CLAUDE.md"
+
+# Or with Claude Code
+claude
+# Then: "Fix the tool drift in /tmp/drift-report.json per CLAUDE.md"
 ```

@@ -10,6 +10,14 @@
     program = "${app}/bin/${name}";
   };
 in {
+  check-drift = mkApp "check-drift" (with pkgs; [
+    coreutils
+    gnugrep
+    jq
+    nix
+    python3
+  ]);
+
   update = mkApp "update" (with pkgs; [
     curl
     git
