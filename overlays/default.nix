@@ -14,6 +14,7 @@
     ./nixos-mcp.nix
     ./openmemory-mcp.nix
     ./sequential-thinking-mcp.nix
+    ./sympy-mcp.nix
   ];
 in
   lib.composeManyExtensions (map import' overlays)

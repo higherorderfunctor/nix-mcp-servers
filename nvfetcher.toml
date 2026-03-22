@@ -57,3 +57,10 @@ fetch.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
 src.github = "github/github-mcp-server"
 fetch.github = "github/github-mcp-server"
 
+
+[sympy-mcp]
+src.git = "https://github.com/sdiehl/sympy-mcp.git"
+src.use_commit = true
+src.branch = "main"
+fetch.github = "sdiehl/sympy-mcp"
+
