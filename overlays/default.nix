@@ -11,6 +11,7 @@
     ./git-mcp.nix
     ./kagi-mcp.nix
     ./nixos-mcp.nix
+    ./openmemory-mcp.nix
   ];
 in
   lib.composeManyExtensions (map import' overlays)
