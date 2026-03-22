@@ -6,6 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 nix-mcp-servers is a Nix flake that packages Model Context Protocol (MCP) servers as Nix derivations with a unified CLI interface.
 
+## Build & Validation Commands
+
+```bash
+nix flake show                # List all outputs (quick validation)
+nix develop                   # Enter devShell with all packages available
+```
+
+## Architecture
+
+### Flake Structure
+
+- **flake.nix** — Defines inputs, composes the overlay, exports packages and devShell.
+
 ## Code Quality
 
 ### Alphabetical Ordering
