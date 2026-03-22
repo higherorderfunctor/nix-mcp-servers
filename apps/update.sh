@@ -28,6 +28,9 @@ nix flake update --flake "$ROOT"
 log "Running nvfetcher"
 nvfetcher -c "$ROOT/nvfetcher.toml" -o "$OVERLAYS/.nvfetcher"
 
+log "Formatting generated files"
+alejandra -q "$OVERLAYS/.nvfetcher/generated.nix"
+
 # ── 3. Regenerate npm lock files ─────────────────────────────────
 regen_lock_tarball() {
 	local name=$1 nv_key=$2

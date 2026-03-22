@@ -19,6 +19,7 @@ in {
   ]);
 
   update = mkApp "update" (with pkgs; [
+    alejandra
     curl
     git
     jq
