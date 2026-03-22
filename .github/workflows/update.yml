@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
 
 # TODO: remove once DeterminateSystems/nix-installer-action ships node24
@@ -41,11 +42,65 @@ jobs:
             | jq -r '.packages."x86_64-linux" // {} | keys[]' \
             | xargs -I{} nix build .#{}
 
+      - name: Check drift
+        id: drift
+        run: |
+          set +e
+          REPORT=$(nix run .#check-drift 2>/tmp/drift-stderr)
+          EXIT_CODE=$?
+          set -e
+
+          cat /tmp/drift-stderr >&2
+
+          if [[ "$EXIT_CODE" -eq 1 ]]; then
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            {
+              echo 'report<<EOF'
+              python3 -c "
+          import json
+          report = json.loads('''$REPORT''')
+          for name, data in sorted(report.items()):
+              if data['status'] != 'drift':
+                  continue
+              print(f'### {name}')
+              if data['added']:
+                  print(f'**Added:** {\", \".join(f\"\`{t}\`\" for t in data[\"added\"])}')
+              if data['removed']:
+                  print(f'**Removed:** {\", \".join(f\"\`{t}\`\" for t in data[\"removed\"])}')
+              print()
+          "
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Dry run summary
         if: env.DRY_RUN == 'true'
         run: |
-          echo "::notice::Dry run on branch ${{ github.ref_name }} — skipping PR creation"
+          echo "::notice::Dry run on branch ${{ github.ref_name }} — skipping PR/issue creation"
           git diff --stat || echo "No changes"
+
+      - name: Create drift issue
+        if: env.DRY_RUN == 'false' && steps.drift.outputs.drift == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "chore: tool drift detected — update meta.tools" \
+            --body "$(cat <<'EOF'
+          ## Tool Drift Detected
+
+          ${{ steps.drift.outputs.report }}
+
+          ## Action Required
+
+          Update `meta.tools` in the affected `modules/servers/<name>.nix` files.
+          See CLAUDE.md § Adding a New MCP Server for the full checklist.
+          EOF
+          )" \
+            --label "automated,drift" \
+            --assignee "@copilot"
 
       - name: Create or update PR
         if: env.DRY_RUN == 'false'
@@ -62,4 +117,6 @@ jobs:
             - Hashes prefetched
 
             Verified with `nix flake check` and `nix build` for all packages.
+
+            ${{ steps.drift.outputs.drift == 'true' && format('## Tool Drift Detected\n\n{0}', steps.drift.outputs.report) || '' }}
           labels: automated
