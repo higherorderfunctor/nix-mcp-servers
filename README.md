@@ -32,3 +32,9 @@ Enter the dev shell for all tools (linters, formatters, LSPs):
 ```sh
 nix develop
 ```
+
+Run all linting and evaluation checks:
+
+```sh
+nix flake check
+```
