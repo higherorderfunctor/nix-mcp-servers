@@ -29,6 +29,12 @@
           pkgs.shellcheck
           pkgs.shellharden
           pkgs.statix
+
+          # LSPs
+          pkgs.bash-language-server
+          pkgs.marksman
+          pkgs.nixd
+          pkgs.taplo
         ];
       };
     });
