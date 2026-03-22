@@ -33,6 +33,7 @@
       inherit lib;
       mcpLib = import ../lib {inherit lib;};
     }) {
+    github-mcp = ./servers/github-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
   };
 

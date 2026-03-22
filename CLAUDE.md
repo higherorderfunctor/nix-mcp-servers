@@ -91,6 +91,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | Pattern        | Used for                                                             | Builder                                                         |
 | -------------- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
+| Go             | github-mcp                                                           | `buildGoModule` with vendorHash                                 |
 
 ### Server Reference
 
@@ -98,6 +99,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | Package   | Upstream                                       | Track      | Builder              | Transport   | Scope  | Tool Discovery |
 | --------- | ---------------------------------------------- | ---------- | -------------------- | ----------- | ------ | -------------- |
 | nixos-mcp | [flake](https://github.com/utensils/mcp-nixos) | flake main | external flake input | stdio, http | remote | runtime        |
+| github-mcp | [GitHub](https://github.com/github/github-mcp-server) | tagged releases | `buildGoModule` | stdio, http | remote | [README](https://github.com/github/github-mcp-server) |
 
 ### Updating Tool Lists
 

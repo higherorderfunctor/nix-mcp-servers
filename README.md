@@ -160,9 +160,10 @@ in
 
 ## Available Servers
 
-| Server                                             | Description                          | Transport   |
-| -------------------------------------------------- | ------------------------------------ | ----------- |
-| [nixos-mcp](https://github.com/utensils/mcp-nixos) | NixOS / Home Manager / nix ecosystem | stdio, http |
+| Server                                                    | Description                          | Transport   |
+| --------------------------------------------------------- | ------------------------------------ | ----------- |
+| [nixos-mcp](https://github.com/utensils/mcp-nixos)        | NixOS / Home Manager / nix ecosystem | stdio, http |
+| [github-mcp](https://github.com/github/github-mcp-server) | GitHub API                           | stdio, http |
 
 All binaries use a unified interface:
 
