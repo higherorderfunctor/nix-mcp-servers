@@ -16,7 +16,7 @@
   } @ inputs: let
     forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
   in {
-    overlays.default = _: _: {};
+    overlays.default = import ./overlays {inherit inputs;};
 
     devShells = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};

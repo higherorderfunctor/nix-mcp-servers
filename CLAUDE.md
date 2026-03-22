@@ -18,6 +18,9 @@ nix develop                   # Enter devShell with all packages available
 ### Flake Structure
 
 - **flake.nix** — Defines inputs, composes the overlay, exports packages and devShell.
+- **overlays/default.nix** — Composes all per-package overlays via `lib.composeManyExtensions`.
+- **overlays/sources.nix** — Overlay that exposes `final.nv-sources.<name>` from nvfetcher's `generated.nix` merged with `hashes.json`.
+- **overlays/mk-mcp-wrapper.nix** — Shared wrapper that gives every server a uniform `--stdio` / `--http` CLI.
 
 ## Code Quality
 
