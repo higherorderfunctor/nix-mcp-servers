@@ -14,4 +14,12 @@
       sha256 = "sha256-G3ZrnUP0QUngr8vDZq/3UoSls4lX00+aQ0vUdeBGvA0=";
     };
   };
+  effect-mcp = {
+    pname = "effect-mcp";
+    version = "0.1.16";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-0.1.16.tgz";
+      sha256 = "sha256-k36Ucri8CAw+xwVVKt58jwkjNlBF79KgHYr9v2lRvk8=";
+    };
+  };
 }

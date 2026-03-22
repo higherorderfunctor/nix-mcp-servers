@@ -91,6 +91,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | -------------- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
 | npm            | context7-mcp                                                         | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
+| Script         | effect-mcp                                                           | `stdenv.mkDerivation` or `writeShellApplication`                |
 
 ### Server Reference
 
@@ -100,6 +101,8 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | nixos-mcp | [flake](https://github.com/utensils/mcp-nixos) | flake main | external flake input | stdio, http | remote | runtime        |
 
 | context7-mcp | [npm](https://www.npmjs.com/package/@upstash/context7-mcp) | npm latest | `buildNpmPackage` | stdio, http | remote | runtime |
+
+| effect-mcp | [npm](https://www.npmjs.com/package/effect-mcp) | npm latest | `stdenv.mkDerivation` | stdio | remote | [source](https://github.com/tim-smart/effect-mcp) |
 
 ### Updating Tool Lists
 
