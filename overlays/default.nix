@@ -13,6 +13,7 @@
     ./kagi-mcp.nix
     ./nixos-mcp.nix
     ./openmemory-mcp.nix
+    ./sequential-thinking-mcp.nix
   ];
 in
   lib.composeManyExtensions (map import' overlays)

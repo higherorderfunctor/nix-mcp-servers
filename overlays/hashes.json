@@ -4,5 +4,8 @@
   },
   "openmemory-mcp": {
     "npmDepsHash": "sha256-D5pw9g8sxk8+9GaC9g/WwxK3XkLDXdrqxBFj3dhU2Io="
+  },
+  "sequential-thinking-mcp": {
+    "npmDepsHash": "sha256-yYqTzF1hTsSADh+DPMSa3+cvkfl3GywLM5pmDW5u+BE="
   }
 }

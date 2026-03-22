@@ -95,4 +95,12 @@
       sha256 = "sha256-cxtfM3NvWjH4Q5V0TiqpFdgzzAeuiV6uX+Zv70dHy9I=";
     };
   };
+  sequential-thinking-mcp = {
+    pname = "sequential-thinking-mcp";
+    version = "2025.12.18";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/-/server-sequential-thinking-2025.12.18.tgz";
+      sha256 = "sha256-WiHm+kc3IrjmIqm7vdcrxtvN30MPJqtZic0z3+XcdwM=";
+    };
+  };
 }

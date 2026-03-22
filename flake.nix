@@ -38,6 +38,7 @@
       kagi-mcp = perPkg "kagi-mcp";
       nixos-mcp = perPkg "nixos-mcp";
       openmemory-mcp = perPkg "openmemory-mcp";
+      sequential-thinking-mcp = perPkg "sequential-thinking-mcp";
     };
 
     homeManagerModules.default = import ./modules/home-manager.nix;
@@ -261,6 +262,7 @@
         kagi-mcp
         nixos-mcp
         openmemory-mcp
+        sequential-thinking-mcp
         ;
     });
 

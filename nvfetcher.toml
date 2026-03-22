@@ -39,6 +39,11 @@ src.cmd = "curl -s https://registry.npmjs.org/openmemory-js/latest | jq -r .vers
 fetch.url = "https://registry.npmjs.org/openmemory-js/-/openmemory-js-$ver.tgz"
 
 
+[sequential-thinking-mcp]
+src.cmd = "curl -s https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/latest | jq -r .version"
+fetch.url = "https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/-/server-sequential-thinking-$ver.tgz"
+
+
 # ── GitHub packages ──────────────────────────────────────────────
 
 [git-intel-mcp]
