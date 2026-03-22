@@ -37,6 +37,7 @@
     kagi-mcp = ./servers/kagi-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
     openmemory-mcp = ./servers/openmemory-mcp.nix;
+    sequential-thinking-mcp = ./servers/sequential-thinking-mcp.nix;
   };
 
   # ── Per-server submodule ───────────────────────────────────────────
