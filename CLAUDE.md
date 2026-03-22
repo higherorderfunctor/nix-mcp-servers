@@ -35,6 +35,9 @@ Current tech stack examples (update when new stacks are added):
 - **Bash:** repeated command sequences → function within the script, or a shared library script for cross-script reuse.
 - **Config/flags:** linter invocations, tool flags, etc. must be defined in one place and consumed by all callers. When adding or changing, update the single source of truth — not each consumer independently.
 
+### Nix
+
+
 ### Bash
 
 All shell scripts (including generated wrappers) must use strict mode:
@@ -44,6 +47,14 @@ All shell scripts (including generated wrappers) must use strict mode:
 set -euETo pipefail
 shopt -s inherit_errexit 2>/dev/null || :
 ```
+
+### Linting
+
+All code must pass the project linters before committing. Run from the devShell:
+
+- **Nix:** `alejandra` (formatting), `deadnix` (dead code), `statix` (anti-patterns)
+- **Shell:** `shellcheck`, `shellharden`, `shfmt`
+- **Markdown/TOML/JSON:** `dprint`
 
 ## Commit Convention
 
