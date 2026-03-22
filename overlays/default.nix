@@ -3,7 +3,14 @@
   import' = path: import path {inherit inputs;};
   overlays = [
     ./sources.nix
+    ./context7-mcp.nix
+    ./effect-mcp.nix
+    ./mcp-proxy.nix
+    ./fetch-mcp.nix
     ./github-mcp.nix
+    ./git-intel-mcp.nix
+    ./git-mcp.nix
+    ./kagi-mcp.nix
     ./nixos-mcp.nix
   ];
 in

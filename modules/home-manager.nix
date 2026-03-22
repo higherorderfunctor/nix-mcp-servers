@@ -33,7 +33,13 @@
       inherit lib;
       mcpLib = import ../lib {inherit lib;};
     }) {
+    context7-mcp = ./servers/context7-mcp.nix;
+    effect-mcp = ./servers/effect-mcp.nix;
+    fetch-mcp = ./servers/fetch-mcp.nix;
     github-mcp = ./servers/github-mcp.nix;
+    git-intel-mcp = ./servers/git-intel-mcp.nix;
+    git-mcp = ./servers/git-mcp.nix;
+    kagi-mcp = ./servers/kagi-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
   };
 

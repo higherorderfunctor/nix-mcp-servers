@@ -28,7 +28,14 @@
         lib.composeManyExtensions [sources (import' ./overlays/${name}.nix)];
     in {
       default = import ./overlays {inherit inputs;};
+      context7-mcp = perPkg "context7-mcp";
+      effect-mcp = perPkg "effect-mcp";
+      mcp-proxy = perPkg "mcp-proxy";
+      fetch-mcp = perPkg "fetch-mcp";
       github-mcp = perPkg "github-mcp";
+      git-intel-mcp = perPkg "git-intel-mcp";
+      git-mcp = perPkg "git-mcp";
+      kagi-mcp = perPkg "kagi-mcp";
       nixos-mcp = perPkg "nixos-mcp";
     };
 
@@ -213,6 +220,7 @@
             }
             {
               services.mcp-servers.servers = {
+                fetch-mcp.enable = true;
                 nixos-mcp.enable = true;
               };
             }
@@ -242,7 +250,14 @@
     in {
       inherit
         (pkgs)
+        context7-mcp
+        effect-mcp
+        mcp-proxy
+        fetch-mcp
         github-mcp
+        git-intel-mcp
+        git-mcp
+        kagi-mcp
         nixos-mcp
         ;
     });

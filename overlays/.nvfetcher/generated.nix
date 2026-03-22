@@ -6,6 +6,44 @@
   dockerTools,
 }:
 {
+  context7-mcp = {
+    pname = "context7-mcp";
+    version = "2.1.4";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-2.1.4.tgz";
+      sha256 = "sha256-G3ZrnUP0QUngr8vDZq/3UoSls4lX00+aQ0vUdeBGvA0=";
+    };
+  };
+  mcp-proxy = {
+    pname = "mcp-proxy";
+    version = "0.11.0";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/m/mcp_proxy/mcp_proxy-0.11.0.tar.gz";
+      sha256 = "sha256-NCTssfV/gXRiXd/w3xW1NKCHGdh89fnWorHgON5pafE=";
+    };
+  };
+  effect-mcp = {
+    pname = "effect-mcp";
+    version = "0.1.16";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-0.1.16.tgz";
+      sha256 = "sha256-k36Ucri8CAw+xwVVKt58jwkjNlBF79KgHYr9v2lRvk8=";
+    };
+  };
+  git-intel-mcp = {
+    pname = "git-intel-mcp";
+    version = "9f216bab8d6bc3a3b850ad77f27d02d63a71e10d";
+    src = fetchgit {
+      url = "https://github.com/hoangsonww/GitIntel-MCP-Server.git";
+      rev = "9f216bab8d6bc3a3b850ad77f27d02d63a71e10d";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sparseCheckout = [ ];
+      sha256 = "sha256-UCIUmU6slN9EjL8Bf2JKfvyoVKE0jgUsfLd8OocdwNc=";
+    };
+    date = "2026-03-18";
+  };
   github-mcp-server = {
     pname = "github-mcp-server";
     version = "v0.32.0";
@@ -15,6 +53,38 @@
       rev = "v0.32.0";
       fetchSubmodules = false;
       sha256 = "sha256-BD/t3UBAvrzJpRI7b06FjE8c+vzdQiXsj6eiUGQX6uA=";
+    };
+  };
+  kagiapi = {
+    pname = "kagiapi";
+    version = "0.2.1";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/k/kagiapi/kagiapi-0.2.1.tar.gz";
+      sha256 = "sha256-NV/kB7TGg9bwhIJ+T4VP2VE03yhC8V0Inaz/Yg4/Sus=";
+    };
+  };
+  kagimcp = {
+    pname = "kagimcp";
+    version = "0.1.4";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/k/kagimcp/kagimcp-0.1.4.tar.gz";
+      sha256 = "sha256-fCFmd6BKyyeggekFsJtno394ZeswTYSRELryHQQAcyY=";
+    };
+  };
+  mcp-server-fetch = {
+    pname = "mcp-server-fetch";
+    version = "2025.4.7";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/m/mcp_server_fetch/mcp_server_fetch-2025.4.7.tar.gz";
+      sha256 = "sha256-VieePFXLHlBrlYypuyPtRBOUSm8jC8oh4ESu5Rc0/kc=";
+    };
+  };
+  mcp-server-git = {
+    pname = "mcp-server-git";
+    version = "2026.1.14";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/m/mcp_server_git/mcp_server_git-2026.1.14.tar.gz";
+      sha256 = "sha256-LNdHBMeycase174mYSDCCuiufMAeUtxsVJeQQCutK0Q=";
     };
   };
 }

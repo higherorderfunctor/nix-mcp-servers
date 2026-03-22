@@ -1,3 +1,47 @@
+# ── PyPI packages ────────────────────────────────────────────────
+
+[mcp-proxy]
+src.pypi = "mcp-proxy"
+fetch.pypi = "mcp_proxy"
+[kagiapi]
+src.pypi = "kagiapi"
+fetch.pypi = "kagiapi"
+
+
+[kagimcp]
+src.pypi = "kagimcp"
+fetch.pypi = "kagimcp"
+
+
+[mcp-server-fetch]
+src.pypi = "mcp-server-fetch"
+fetch.pypi = "mcp_server_fetch"
+
+
+[mcp-server-git]
+src.pypi = "mcp-server-git"
+fetch.pypi = "mcp_server_git"
+
+
+# ── npm packages ──────────────────────────────────────────────────
+
+[context7-mcp]
+src.cmd = "curl -s https://registry.npmjs.org/@upstash/context7-mcp/latest | jq -r .version"
+fetch.url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-$ver.tgz"
+
+[effect-mcp]
+src.cmd = "curl -s https://registry.npmjs.org/effect-mcp/latest | jq -r .version"
+fetch.url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-$ver.tgz"
+
+
+
+# ── GitHub packages ──────────────────────────────────────────────
+
+[git-intel-mcp]
+src.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
+src.use_commit = true
+src.branch = "master"
+fetch.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
 
 
 [github-mcp-server]
