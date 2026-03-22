@@ -28,5 +28,20 @@
             "url": "https://registry.npmjs.org/effect-mcp/-/effect-mcp-0.1.16.tgz"
         },
         "version": "0.1.16"
+    },
+    "mcp-server-fetch": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "mcp-server-fetch",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-VieePFXLHlBrlYypuyPtRBOUSm8jC8oh4ESu5Rc0/kc=",
+            "type": "url",
+            "url": "https://pypi.org/packages/source/m/mcp_server_fetch/mcp_server_fetch-2025.4.7.tar.gz"
+        },
+        "version": "2025.4.7"
     }
 }

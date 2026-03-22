@@ -92,6 +92,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
 | npm            | context7-mcp                                                         | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
 | Script         | effect-mcp                                                           | `stdenv.mkDerivation` or `writeShellApplication`                |
+| Python         | fetch-mcp                                                            | `python313Packages.buildPythonApplication` with pyproject       |
 
 ### Server Reference
 
@@ -103,6 +104,8 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | context7-mcp | [npm](https://www.npmjs.com/package/@upstash/context7-mcp) | npm latest | `buildNpmPackage` | stdio, http | remote | runtime |
 
 | effect-mcp | [npm](https://www.npmjs.com/package/effect-mcp) | npm latest | `stdenv.mkDerivation` | stdio | remote | [source](https://github.com/tim-smart/effect-mcp) |
+
+| fetch-mcp | [PyPI](https://pypi.org/project/mcp-server-fetch/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | remote | runtime |
 
 ### Updating Tool Lists
 
