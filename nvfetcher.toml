@@ -3,6 +3,10 @@
 [mcp-proxy]
 src.pypi = "mcp-proxy"
 fetch.pypi = "mcp_proxy"
+[mcp-server-fetch]
+src.pypi = "mcp-server-fetch"
+fetch.pypi = "mcp_server_fetch"
+
 
 # ── npm packages ──────────────────────────────────────────────────
 

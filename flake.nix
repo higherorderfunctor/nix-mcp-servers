@@ -31,6 +31,7 @@
       context7-mcp = perPkg "context7-mcp";
       effect-mcp = perPkg "effect-mcp";
       mcp-proxy = perPkg "mcp-proxy";
+      fetch-mcp = perPkg "fetch-mcp";
       nixos-mcp = perPkg "nixos-mcp";
     };
 
@@ -215,6 +216,7 @@
             }
             {
               services.mcp-servers.servers = {
+                fetch-mcp.enable = true;
                 nixos-mcp.enable = true;
               };
             }
@@ -247,6 +249,7 @@
         context7-mcp
         effect-mcp
         mcp-proxy
+        fetch-mcp
         nixos-mcp
         ;
     });

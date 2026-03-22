@@ -6,6 +6,7 @@
     ./context7-mcp.nix
     ./effect-mcp.nix
     ./mcp-proxy.nix
+    ./fetch-mcp.nix
     ./nixos-mcp.nix
   ];
 in
