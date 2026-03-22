@@ -201,6 +201,14 @@ All binaries use a unified interface:
 
 Servers marked **(local)** operate on the local filesystem and should not be proxied to HTTP.
 
+## HTTP-only Servers
+
+Remote MCP servers that need no local packaging — configure directly in `mcp.json` with `"type": "http"`.
+
+| Server                                                                           | URL                                    |
+| -------------------------------------------------------------------------------- | -------------------------------------- |
+| [AWS Knowledge](https://awslabs.github.io/mcp/servers/aws-knowledge-mcp-server/) | `https://knowledge-mcp.global.api.aws` |
+
 ## Updating
 
 ```sh
