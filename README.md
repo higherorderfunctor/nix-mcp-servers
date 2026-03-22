@@ -167,6 +167,8 @@ in
 
 | [kagi-mcp](https://github.com/kagisearch/kagi-mcp) | Kagi search and summarization | stdio, http |
 
+| [openmemory-mcp](https://github.com/CaviraOSS/OpenMemory) | OpenMemory long-term memory | stdio |
+
 All binaries use a unified interface:
 
 ```sh

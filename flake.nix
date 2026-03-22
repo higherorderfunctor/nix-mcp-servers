@@ -37,6 +37,7 @@
       git-mcp = perPkg "git-mcp";
       kagi-mcp = perPkg "kagi-mcp";
       nixos-mcp = perPkg "nixos-mcp";
+      openmemory-mcp = perPkg "openmemory-mcp";
     };
 
     homeManagerModules.default = import ./modules/home-manager.nix;
@@ -259,6 +260,7 @@
         git-mcp
         kagi-mcp
         nixos-mcp
+        openmemory-mcp
         ;
     });
 

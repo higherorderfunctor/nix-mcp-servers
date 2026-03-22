@@ -61,6 +61,10 @@ regen_lock_git() {
 	rm -rf "$tmp"
 }
 
+regen_lock_tarball context7-mcp context7-mcp
+regen_lock_git git-intel-mcp git-intel-mcp
+regen_lock_tarball openmemory-mcp openmemory-mcp
+
 # ── 4. Inject npmDepsHash into hashes.json ─────────────────────
 update_npm_hash() {
 	local name=$1 nv_key=$2
@@ -71,6 +75,10 @@ update_npm_hash() {
 	hash=$(prefetch-npm-deps "$lock" 2>/dev/null)
 	inject_hash "$nv_key" "npmDepsHash" "$hash"
 }
+
+update_npm_hash context7-mcp context7-mcp
+update_npm_hash git-intel-mcp git-intel-mcp
+update_npm_hash openmemory-mcp openmemory-mcp
 
 # ── 5. Inject Go vendorHash into hashes.json ───────────────────
 update_vendor_hash() {

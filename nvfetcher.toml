@@ -34,6 +34,10 @@ src.cmd = "curl -s https://registry.npmjs.org/effect-mcp/latest | jq -r .version
 fetch.url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-$ver.tgz"
 
 
+[openmemory-mcp]
+src.cmd = "curl -s https://registry.npmjs.org/openmemory-js/latest | jq -r .version"
+fetch.url = "https://registry.npmjs.org/openmemory-js/-/openmemory-js-$ver.tgz"
+
 
 # ── GitHub packages ──────────────────────────────────────────────
 
