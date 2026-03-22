@@ -1,0 +1,36 @@
+{
+  "nix": {
+    "command": "nixd",
+    "args": [],
+    "extensionToLanguage": {
+      ".nix": "nix"
+    },
+    "settings": {
+      "formatting": {
+        "command": ["alejandra"]
+      }
+    }
+  },
+  "bash": {
+    "command": "bash-language-server",
+    "args": ["start"],
+    "extensionToLanguage": {
+      ".sh": "shellscript",
+      ".bash": "shellscript"
+    }
+  },
+  "markdown": {
+    "command": "marksman",
+    "args": ["server"],
+    "extensionToLanguage": {
+      ".md": "markdown"
+    }
+  },
+  "toml": {
+    "command": "taplo",
+    "args": ["lsp", "stdio"],
+    "extensionToLanguage": {
+      ".toml": "toml"
+    }
+  }
+}
