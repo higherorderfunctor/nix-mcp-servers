@@ -211,6 +211,8 @@ in
 
 | [fetch-mcp](https://github.com/modelcontextprotocol/servers) | HTTP fetch and content extraction | stdio |
 
+| [git-intel-mcp](https://github.com/hoangsonww/GitIntel-MCP-Server) | Git repository analytics | stdio (local) |
+
 All binaries use a unified interface:
 
 ```sh

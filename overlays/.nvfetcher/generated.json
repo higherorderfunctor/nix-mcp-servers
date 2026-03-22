@@ -44,6 +44,26 @@
         },
         "version": "0.1.16"
     },
+    "git-intel-mcp": {
+        "cargoLock": null,
+        "date": "2026-03-18",
+        "extract": null,
+        "name": "git-intel-mcp",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "9f216bab8d6bc3a3b850ad77f27d02d63a71e10d",
+            "sha256": "sha256-UCIUmU6slN9EjL8Bf2JKfvyoVKE0jgUsfLd8OocdwNc=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
+        },
+        "version": "9f216bab8d6bc3a3b850ad77f27d02d63a71e10d"
+    },
     "mcp-server-fetch": {
         "cargoLock": null,
         "date": null,

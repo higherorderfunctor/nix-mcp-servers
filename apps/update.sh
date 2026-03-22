@@ -62,6 +62,7 @@ regen_lock_git() {
 }
 
 regen_lock_tarball context7-mcp context7-mcp
+regen_lock_git git-intel-mcp git-intel-mcp
 
 # ── 4. Inject npmDepsHash into hashes.json ─────────────────────
 update_npm_hash() {
@@ -75,6 +76,7 @@ update_npm_hash() {
 }
 
 update_npm_hash context7-mcp context7-mcp
+update_npm_hash git-intel-mcp git-intel-mcp
 
 # ── 5. Inject Go vendorHash into hashes.json ───────────────────
 update_vendor_hash() {

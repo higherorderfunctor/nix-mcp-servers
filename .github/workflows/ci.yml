@@ -32,6 +32,7 @@ jobs:
           - effect-mcp
           - mcp-proxy
           - fetch-mcp
+          - git-intel-mcp
           - nixos-mcp
     steps:
       - uses: actions/checkout@v6
