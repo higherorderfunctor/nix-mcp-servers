@@ -33,6 +33,7 @@
       mcp-proxy = perPkg "mcp-proxy";
       fetch-mcp = perPkg "fetch-mcp";
       git-intel-mcp = perPkg "git-intel-mcp";
+      git-mcp = perPkg "git-mcp";
       nixos-mcp = perPkg "nixos-mcp";
     };
 
@@ -252,6 +253,7 @@
         mcp-proxy
         fetch-mcp
         git-intel-mcp
+        git-mcp
         nixos-mcp
         ;
     });

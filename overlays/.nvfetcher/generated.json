@@ -78,5 +78,20 @@
             "url": "https://pypi.org/packages/source/m/mcp_server_fetch/mcp_server_fetch-2025.4.7.tar.gz"
         },
         "version": "2025.4.7"
+    },
+    "mcp-server-git": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "mcp-server-git",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-LNdHBMeycase174mYSDCCuiufMAeUtxsVJeQQCutK0Q=",
+            "type": "url",
+            "url": "https://pypi.org/packages/source/m/mcp_server_git/mcp_server_git-2026.1.14.tar.gz"
+        },
+        "version": "2026.1.14"
     }
 }

@@ -52,4 +52,12 @@
       sha256 = "sha256-VieePFXLHlBrlYypuyPtRBOUSm8jC8oh4ESu5Rc0/kc=";
     };
   };
+  mcp-server-git = {
+    pname = "mcp-server-git";
+    version = "2026.1.14";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/m/mcp_server_git/mcp_server_git-2026.1.14.tar.gz";
+      sha256 = "sha256-LNdHBMeycase174mYSDCCuiufMAeUtxsVJeQQCutK0Q=";
+    };
+  };
 }
