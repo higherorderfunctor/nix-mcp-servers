@@ -4,5 +4,8 @@
   },
   "git-intel-mcp": {
     "npmDepsHash": "sha256-SE9cbfHuhYqxZEZNPdzbj2eHa/oLitscZu9M+NZyDrc="
+  },
+  "github-mcp-server": {
+    "vendorHash": "sha256-q21hnMnWOzfg7BGDl4KM1I3v0wwS5sSxzLA++L6jO4s="
   }
 }

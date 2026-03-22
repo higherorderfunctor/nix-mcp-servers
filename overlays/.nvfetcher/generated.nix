@@ -36,6 +36,17 @@
     };
     date = "2026-03-18";
   };
+  github-mcp-server = {
+    pname = "github-mcp-server";
+    version = "v0.32.0";
+    src = fetchFromGitHub {
+      owner = "github";
+      repo = "github-mcp-server";
+      rev = "v0.32.0";
+      fetchSubmodules = false;
+      sha256 = "sha256-BD/t3UBAvrzJpRI7b06FjE8c+vzdQiXsj6eiUGQX6uA=";
+    };
+  };
   mcp-server-fetch = {
     pname = "mcp-server-fetch";
     version = "2025.4.7";

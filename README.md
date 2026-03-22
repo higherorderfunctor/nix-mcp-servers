@@ -181,6 +181,8 @@ in
 
 | [git-mcp](https://github.com/modelcontextprotocol/servers) | Git repository operations | stdio (local) |
 
+| [github-mcp](https://github.com/github/github-mcp-server) | GitHub API | stdio, http |
+
 All binaries use a unified interface:
 
 ```sh

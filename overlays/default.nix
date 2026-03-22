@@ -6,6 +6,7 @@
     ./context7-mcp.nix
     ./effect-mcp.nix
     ./fetch-mcp.nix
+    ./github-mcp.nix
     ./git-intel-mcp.nix
     ./git-mcp.nix
     ./nixos-mcp.nix

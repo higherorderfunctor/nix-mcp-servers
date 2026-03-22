@@ -49,6 +49,27 @@
         },
         "version": "9f216bab8d6bc3a3b850ad77f27d02d63a71e10d"
     },
+    "github-mcp-server": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "github-mcp-server",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "github",
+            "repo": "github-mcp-server",
+            "rev": "v0.32.0",
+            "sha256": "sha256-BD/t3UBAvrzJpRI7b06FjE8c+vzdQiXsj6eiUGQX6uA=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.32.0"
+    },
     "mcp-server-fetch": {
         "cargoLock": null,
         "date": null,
