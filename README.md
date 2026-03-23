@@ -21,6 +21,12 @@ Apply the overlay:
 overlays = [ inputs.nix-mcp-servers.overlays.default ];
 ```
 
+To use a single server's overlay instead of all:
+
+```nix
+overlays = [ inputs.nix-mcp-servers.overlays."<server-name>" ];
+```
+
 ### Binary cache
 
 Pre-built binaries are available via [Cachix](https://app.cachix.org/cache/hof-nix-mcp-servers). Add the cache to skip building from source:
@@ -64,6 +70,111 @@ home.file.".config/claude/mcp.json".text =
 ```
 
 Servers with `transport = "http"` get systemd user services automatically.
+
+## Tool Permissions
+
+The module exposes `config.services.mcp-servers.tools` — an attrset of each enabled server's tool names. Use this to build client-specific auto-approval configs.
+
+### Claude Code
+
+Generate `permissions.allow` entries for `~/.claude/settings.json`:
+
+```nix
+let
+  approved = {
+    <server-name> = config.services.mcp-servers.tools.<server-name>;
+  };
+in {
+  home.file.".claude/settings.json".text = builtins.toJSON {
+    permissions.allow =
+      inputs.nix-mcp-servers.lib.mapTools
+        (server: tool: "mcp__${server}__${tool}")
+        approved;
+  };
+}
+```
+
+### Generic JSON
+
+Export approved tools as JSON for any MCP client:
+
+```nix
+home.file.".config/mcp-approved-tools.json".text = builtins.toJSON {
+  <server-name> = config.services.mcp-servers.tools.<server-name>;
+};
+```
+
+### CLI flags
+
+Generate a comma-separated list for tools that accept `--allowedTools` or similar:
+
+```nix
+let
+  allTools = inputs.nix-mcp-servers.lib.mapTools (_: tool: tool)
+    config.services.mcp-servers.tools;
+in
+  lib.concatStringsSep "," allTools
+```
+
+## Without Home Manager
+
+### Typed config with `mkStdioConfig`
+
+Use `lib.mkStdioConfig` for validated settings without Home Manager — works in devShells, repo flakes, and non-HM systems:
+
+```nix
+let
+  mcp = inputs.nix-mcp-servers.lib.mkStdioConfig pkgs {
+    nixos-mcp = {};
+  };
+in
+  builtins.toJSON mcp
+# => { mcpServers = { nixos-mcp = { type = "stdio"; ... }; }; }
+```
+
+For servers that need secrets at runtime:
+
+```nix
+mcpConfig.mcpServers.github-mcp =
+  inputs.nix-mcp-servers.lib.mkStdioEntry pkgs {
+    name = "github-mcp";
+    environmentFiles = [ "/run/secrets/github-token" ];
+    settings = { readOnly = true; };
+  };
+```
+
+### Manual config with `mkMcpConfig`
+
+For full control without typed settings, use `lib.mkMcpConfig` with raw entries:
+
+```nix
+let
+  mcp = inputs.nix-mcp-servers.lib.mkMcpConfig {
+    <server-name> = {
+      type = "stdio";
+      command = lib.getExe pkgs.<server-name>;
+      args = [ "--stdio" ];
+    };
+  };
+in
+  builtins.toJSON mcp
+```
+
+## Available Servers
+
+| Server                                             | Description                          | Transport   |
+| -------------------------------------------------- | ------------------------------------ | ----------- |
+| [nixos-mcp](https://github.com/utensils/mcp-nixos) | NixOS / Home Manager / nix ecosystem | stdio, http |
+
+All binaries use a unified interface:
+
+```sh
+<package> --stdio [-- extra-args...]
+<package> --http [-- extra-args...]   # only where Transport includes http
+<package> --version
+```
+
+Servers marked **(local)** operate on the local filesystem and should not be proxied to HTTP.
 
 ## Updating
 
