@@ -5,4 +5,13 @@
   fetchFromGitHub,
   dockerTools,
 }:
-{}
+{
+  context7-mcp = {
+    pname = "context7-mcp";
+    version = "2.1.4";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-2.1.4.tgz";
+      sha256 = "sha256-G3ZrnUP0QUngr8vDZq/3UoSls4lX00+aQ0vUdeBGvA0=";
+    };
+  };
+}

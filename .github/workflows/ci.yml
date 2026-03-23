@@ -28,6 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         package:
+          - context7-mcp
           - nixos-mcp
     steps:
       - uses: actions/checkout@v6

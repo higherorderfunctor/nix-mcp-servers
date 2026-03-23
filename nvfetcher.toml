@@ -1,1 +1,6 @@
+# ── npm packages ──────────────────────────────────────────────────
+
+[context7-mcp]
+src.cmd = "curl -s https://registry.npmjs.org/@upstash/context7-mcp/latest | jq -r .version"
+fetch.url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-$ver.tgz"
 

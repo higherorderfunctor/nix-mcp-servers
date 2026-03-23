@@ -1,1 +1,17 @@
-{}
+{
+    "context7-mcp": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "context7-mcp",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-G3ZrnUP0QUngr8vDZq/3UoSls4lX00+aQ0vUdeBGvA0=",
+            "type": "url",
+            "url": "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-2.1.4.tgz"
+        },
+        "version": "2.1.4"
+    }
+}
