@@ -26,9 +26,9 @@
   cfg = config.services.mcp-servers;
 
   # ── Import per-server definitions ──────────────────────────────────
-  serverFiles =
-    mapAttrs (_: path: import path {inherit lib;}) {
-    };
+  serverFiles = mapAttrs (_: path: import path {inherit lib;}) {
+    nixos-mcp = ./servers/nixos-mcp.nix;
+  };
 
   # ── Per-server submodule ───────────────────────────────────────────
   mkServerModule = name: serverDef: _: {

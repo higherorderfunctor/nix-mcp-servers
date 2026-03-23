@@ -7,6 +7,10 @@
       url = "github:berberman/nvfetcher";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    mcp-nixos = {
+      url = "github:utensils/mcp-nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -16,16 +20,38 @@
   } @ inputs: let
     forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
   in {
-    overlays.default = import ./overlays {inherit inputs;};
+    overlays = let
+      inherit (nixpkgs) lib;
+      import' = path: import path {inherit inputs;};
+      sources = import' ./overlays/sources.nix;
+      perPkg = name:
+        lib.composeManyExtensions [sources (import' ./overlays/${name}.nix)];
+    in {
+      default = import ./overlays {inherit inputs;};
+      nixos-mcp = perPkg "nixos-mcp";
+    };
 
     homeManagerModules.default = import ./modules/home-manager.nix;
 
     lib = {
       # Generate an mcp.json-compatible attrset from a flat server map.
+      #
+      # Each value must have at minimum: { type, command?, args?, env?, url? }
+      #
+      # Example:
+      #   mkMcpConfig {
+      #     nixos-mcp = { type = "stdio"; command = lib.getExe pkgs.nixos-mcp; args = ["--stdio"]; };
+      #   }
+      #   => { mcpServers = { nixos-mcp = { ... }; }; }
       mkMcpConfig = servers: {mcpServers = servers;};
 
       # Map a function over every (server, tool) pair in a tools attrset.
+      #
       # Type: (String -> String -> a) -> AttrSet -> [a]
+      #
+      # Example:
+      #   mapTools (server: tool: "mcp__${server}__${tool}") { nixos-mcp = ["get_issue"]; }
+      #   => [ "mcp__nixos-mcp__get_issue" ]
       mapTools = f: tools:
         nixpkgs.lib.concatLists (nixpkgs.lib.mapAttrsToList
           (server: toolList: map (tool: f server tool) toolList)
@@ -33,30 +59,35 @@
     };
 
     devShells = forAllSystems (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [self.overlays.default];
+      };
     in {
       default = pkgs.mkShellNoCC {
-        packages = [
-          # Formatting
-          pkgs.alejandra
-          pkgs.dprint
-          pkgs.shfmt
+        packages =
+          builtins.attrValues self.packages.${system}
+          ++ [
+            # Formatting
+            pkgs.alejandra
+            pkgs.dprint
+            pkgs.shfmt
 
-          # Linting
-          pkgs.deadnix
-          pkgs.shellcheck
-          pkgs.shellharden
-          pkgs.statix
+            # Linting
+            pkgs.deadnix
+            pkgs.shellcheck
+            pkgs.shellharden
+            pkgs.statix
 
-          # LSPs
-          pkgs.bash-language-server
-          pkgs.marksman
-          pkgs.nixd
-          pkgs.taplo
+            # LSPs
+            pkgs.bash-language-server
+            pkgs.marksman
+            pkgs.nixd
+            pkgs.taplo
 
-          # Version tracking
-          inputs.nvfetcher.packages.${system}.default
-        ];
+            # Version tracking
+            inputs.nvfetcher.packages.${system}.default
+          ];
       };
     });
 
@@ -147,6 +178,18 @@
       };
     in
       import ./apps {inherit pkgs;});
+
+    packages = forAllSystems (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [self.overlays.default];
+      };
+    in {
+      inherit
+        (pkgs)
+        nixos-mcp
+        ;
+    });
 
     formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
   };
