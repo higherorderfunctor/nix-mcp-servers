@@ -159,5 +159,26 @@
             "url": "https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/-/server-sequential-thinking-2025.12.18.tgz"
         },
         "version": "2025.12.18"
+    },
+    "sympy-mcp": {
+        "cargoLock": null,
+        "date": "2026-03-18",
+        "extract": null,
+        "name": "sympy-mcp",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "sdiehl",
+            "repo": "sympy-mcp",
+            "rev": "646c69558b622ab0e2814c58aa82143e56b76c33",
+            "sha256": "sha256-AjRdiBtsF/ZpAUt+TPhvkT8VQ3y7rcJSogSSyQQXytI=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "646c69558b622ab0e2814c58aa82143e56b76c33"
     }
 }

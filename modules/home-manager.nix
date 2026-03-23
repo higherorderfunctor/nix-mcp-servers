@@ -38,6 +38,7 @@
     nixos-mcp = ./servers/nixos-mcp.nix;
     openmemory-mcp = ./servers/openmemory-mcp.nix;
     sequential-thinking-mcp = ./servers/sequential-thinking-mcp.nix;
+    sympy-mcp = ./servers/sympy-mcp.nix;
   };
 
   # ── Per-server submodule ───────────────────────────────────────────

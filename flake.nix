@@ -38,6 +38,7 @@
       nixos-mcp = perPkg "nixos-mcp";
       openmemory-mcp = perPkg "openmemory-mcp";
       sequential-thinking-mcp = perPkg "sequential-thinking-mcp";
+      sympy-mcp = perPkg "sympy-mcp";
     };
 
     homeManagerModules.default = import ./modules/home-manager.nix;
@@ -208,6 +209,7 @@
         nixos-mcp
         openmemory-mcp
         sequential-thinking-mcp
+        sympy-mcp
         ;
     });
 
