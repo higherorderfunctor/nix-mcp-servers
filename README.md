@@ -40,6 +40,31 @@ extra-substituters = https://hof-nix-mcp-servers.cachix.org
 extra-trusted-public-keys = hof-nix-mcp-servers.cachix.org-1:UeB1pQXJ3uQHKVDB8zsbztxmzBBqcTrIAKGGv3AWwPY=
 ```
 
+## Home Manager
+
+Enable the module and configure servers declaratively:
+
+```nix
+{
+  imports = [ inputs.nix-mcp-servers.homeManagerModules.default ];
+
+  services.mcp-servers = {
+    enable = true;
+
+    servers.<server-name>.enable = true;
+  };
+}
+```
+
+Write the generated config to your MCP client:
+
+```nix
+home.file.".config/claude/mcp.json".text =
+  builtins.toJSON config.services.mcp-servers.mcpConfig;
+```
+
+Servers with `transport = "http"` get systemd user services automatically.
+
 ## Updating
 
 ```sh
@@ -51,6 +76,13 @@ Updates flake inputs, refreshes upstream versions via nvfetcher, regenerates loc
 ## Contributing
 
 Issues and PRs for new servers are welcome.
+
+### Prerequisites
+
+- [Nix](https://nixos.org/) with flakes enabled
+- Optional: [direnv](https://direnv.net/) with
+  [nix-direnv](https://github.com/nix-community/nix-direnv) to automatically
+  load the flake dev shell (`.envrc` uses `use flake` which requires nix-direnv)
 
 ### Development
 

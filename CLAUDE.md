@@ -19,9 +19,10 @@ nix fmt                       # Format all Nix files with alejandra
 
 ### Flake Structure
 
-- **flake.nix** — Defines inputs, composes the overlay, exports packages and devShell.
+- **flake.nix** — Defines inputs, composes the overlay, exports packages, devShell, and `homeManagerModules.default`.
 - **overlays/default.nix** — Composes all per-package overlays via `lib.composeManyExtensions`.
 - **overlays/sources.nix** — Overlay that exposes `final.nv-sources.<name>` from nvfetcher's `generated.nix` merged with `hashes.json`.
+- **modules/home-manager.nix** — Home Manager module with `services.mcp-servers` options, generates `mcp.json` and systemd services.
 - **overlays/mk-mcp-wrapper.nix** — Shared wrapper that gives every server a uniform `--stdio` / `--http` CLI.
 
 ### mkMcpWrapper
@@ -46,7 +47,7 @@ Current tech stack examples (update when new stacks are added):
 
 ### Nix
 
-Overlay functions accessing nvfetcher sources must go through `final.nv-sources.<key>` — never import `generated.nix` directly. Computed hashes (`npmDepsHash`, `vendorHash`) belong in the `overlays/hashes.json` sidecar, not inline in overlay files.
+All Home Manager module options must use explicit NixOS module types (`types.str`, `types.enum`, `types.nullOr`, `types.port`, etc.) to produce clear evaluation-time errors. Never use `types.anything` or untyped values where a specific type is known. Overlay functions accessing nvfetcher sources must go through `final.nv-sources.<key>` — never import `generated.nix` directly. Computed hashes (`npmDepsHash`, `vendorHash`) belong in the `overlays/hashes.json` sidecar, not inline in overlay files.
 
 ### Bash
 
@@ -114,3 +115,19 @@ Consumers pin versions via their own `flake.lock`. Per-package version overrides
 ### Update App (`nix run .#update`)
 
 Defined in `apps/update.nix` wrapping `apps/update.sh` via `writeShellApplication` with all runtime dependencies. Runs 6 steps: (1) `nix flake update`, (2) `nvfetcher` to refresh versions, (3) regenerate npm lock files, (4) update `npmDepsHash` values via `prefetch-npm-deps`, (5) update Go `vendorHash`, (6) verify with `nix flake show`.
+
+## Home Manager Module
+
+Servers are configured under `services.mcp-servers.servers.<name>` with options: `enable`, `package`, `transport` (stdio/http), `port`, `host`, `settings`, `env`, `args`. Servers marked `local` in the module are stdio-only. Remote/HTTP servers get systemd user services.
+
+### `settingsToEnv` / `settingsToArgs` Contract
+
+Every environment variable or CLI flag an upstream server reads should be lifted into a typed NixOS option in `settingsOptions`. `settingsToEnv` and `settingsToArgs` bridge typed options back to the format the server expects. Users never write raw env var names — they set typed options.
+
+### General vs Server-Specific Options
+
+`port`, `host`, `transport` are general options shared across all servers. Server-specific configuration (e.g., `path` for nixos-mcp's HTTP mount point) goes in `settingsOptions`. If an upstream env var maps directly to a general option, `settingsToEnv` reads the general option — no duplicate in `settingsOptions`.
+
+### Drift Detection Scope
+
+Drift detection should cover both tools AND config options. When upstream adds a new env var, drift should flag it so we can lift it into a typed option.
