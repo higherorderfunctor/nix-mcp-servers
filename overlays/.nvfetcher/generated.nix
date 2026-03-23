@@ -79,4 +79,12 @@
       sha256 = "sha256-LNdHBMeycase174mYSDCCuiufMAeUtxsVJeQQCutK0Q=";
     };
   };
+  openmemory-mcp = {
+    pname = "openmemory-mcp";
+    version = "1.3.3";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/openmemory-js/-/openmemory-js-1.3.3.tgz";
+      sha256 = "sha256-cxtfM3NvWjH4Q5V0TiqpFdgzzAeuiV6uX+Zv70dHy9I=";
+    };
+  };
 }

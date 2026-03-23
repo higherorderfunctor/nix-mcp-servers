@@ -36,6 +36,7 @@
     git-mcp = ./servers/git-mcp.nix;
     kagi-mcp = ./servers/kagi-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
+    openmemory-mcp = ./servers/openmemory-mcp.nix;
   };
 
   # ── Per-server submodule ───────────────────────────────────────────

@@ -90,7 +90,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | Pattern        | Used for                                                             | Builder                                                         |
 | -------------- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
-| npm            | context7-mcp, git-intel-mcp                                          | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
+| npm            | context7-mcp, git-intel-mcp, openmemory-mcp                          | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
 | Script         | effect-mcp                                                           | `stdenv.mkDerivation` or `writeShellApplication`                |
 | Python         | fetch-mcp, git-mcp, kagi-mcp                                         | `python313Packages.buildPythonApplication` with pyproject       |
 | Go             | github-mcp                                                           | `buildGoModule` with vendorHash                                 |
@@ -115,6 +115,8 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | github-mcp | [GitHub](https://github.com/github/github-mcp-server) | tagged releases | `buildGoModule` | stdio, http | remote | [README](https://github.com/github/github-mcp-server) |
 
 | kagi-mcp | [PyPI](https://pypi.org/project/kagimcp/) | PyPI latest | `buildPythonApplication` (3.14) | stdio, http | remote | [source](https://github.com/kagisearch/kagi-mcp) |
+
+| openmemory-mcp | [npm](https://www.npmjs.com/package/openmemory-js) | npm latest | `buildNpmPackage` | stdio | remote | [source](https://github.com/CaviraOSS/OpenMemory) |
 
 ### Updating Tool Lists
 
