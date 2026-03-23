@@ -93,6 +93,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | npm            | context7-mcp, git-intel-mcp                                          | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
 | Script         | effect-mcp                                                           | `stdenv.mkDerivation` or `writeShellApplication`                |
 | Python         | fetch-mcp, git-mcp                                                   | `python313Packages.buildPythonApplication` with pyproject       |
+| Go             | github-mcp                                                           | `buildGoModule` with vendorHash                                 |
 
 ### Server Reference
 
@@ -110,6 +111,8 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | git-intel-mcp | [GitHub](https://github.com/hoangsonww/GitIntel-MCP-Server) | master HEAD | `buildNpmPackage` | stdio | local | runtime |
 
 | git-mcp | [PyPI](https://pypi.org/project/mcp-server-git/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | local | runtime |
+
+| github-mcp | [GitHub](https://github.com/github/github-mcp-server) | tagged releases | `buildGoModule` | stdio, http | remote | [README](https://github.com/github/github-mcp-server) |
 
 ### Updating Tool Lists
 

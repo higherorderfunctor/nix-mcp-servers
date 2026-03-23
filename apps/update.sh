@@ -102,6 +102,8 @@ update_vendor_hash() {
 	fi
 }
 
+update_vendor_hash github-mcp-server
+
 # ── 6. Verify ────────────────────────────────────────────────────
 log "Staging changes"
 git -C "$ROOT" add -A

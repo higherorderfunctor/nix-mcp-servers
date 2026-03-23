@@ -31,6 +31,7 @@
       context7-mcp = perPkg "context7-mcp";
       effect-mcp = perPkg "effect-mcp";
       fetch-mcp = perPkg "fetch-mcp";
+      github-mcp = perPkg "github-mcp";
       git-intel-mcp = perPkg "git-intel-mcp";
       git-mcp = perPkg "git-mcp";
       nixos-mcp = perPkg "nixos-mcp";
@@ -45,9 +46,9 @@
       #
       # Example:
       #   mkMcpConfig {
-      #     nixos-mcp = { type = "stdio"; command = lib.getExe pkgs.nixos-mcp; args = ["--stdio"]; };
+      #     github-mcp = { type = "stdio"; command = lib.getExe pkgs.github-mcp; args = ["--stdio"]; };
       #   }
-      #   => { mcpServers = { nixos-mcp = { ... }; }; }
+      #   => { mcpServers = { github-mcp = { ... }; }; }
       mkMcpConfig = servers: {mcpServers = servers;};
 
       # Map a function over every (server, tool) pair in a tools attrset.
@@ -55,8 +56,8 @@
       # Type: (String -> String -> a) -> AttrSet -> [a]
       #
       # Example:
-      #   mapTools (server: tool: "mcp__${server}__${tool}") { nixos-mcp = ["get_issue"]; }
-      #   => [ "mcp__nixos-mcp__get_issue" ]
+      #   mapTools (server: tool: "mcp__${server}__${tool}") { github-mcp = ["get_issue"]; }
+      #   => [ "mcp__github-mcp__get_issue" ]
       mapTools = f: tools:
         nixpkgs.lib.concatLists (nixpkgs.lib.mapAttrsToList
           (server: toolList: map (tool: f server tool) toolList)
@@ -197,6 +198,7 @@
         context7-mcp
         effect-mcp
         fetch-mcp
+        github-mcp
         git-intel-mcp
         git-mcp
         nixos-mcp
