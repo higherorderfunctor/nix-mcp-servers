@@ -5,6 +5,11 @@ src.pypi = "mcp-server-fetch"
 fetch.pypi = "mcp_server_fetch"
 
 
+[mcp-server-git]
+src.pypi = "mcp-server-git"
+fetch.pypi = "mcp_server_git"
+
+
 # ── npm packages ──────────────────────────────────────────────────
 
 [context7-mcp]

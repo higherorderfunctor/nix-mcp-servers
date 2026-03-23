@@ -179,6 +179,8 @@ in
 
 | [git-intel-mcp](https://github.com/hoangsonww/GitIntel-MCP-Server) | Git repository analytics | stdio (local) |
 
+| [git-mcp](https://github.com/modelcontextprotocol/servers) | Git repository operations | stdio (local) |
+
 All binaries use a unified interface:
 
 ```sh
