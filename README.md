@@ -69,6 +69,38 @@ Enabling a server creates a systemd HTTP service and an HTTP entry in `mcpConfig
 
 For stdio-only configs (devShells, non-HM systems), use `lib.mkStdioConfig` or `lib.mkStdioEntry` directly — see [Without Home Manager](#without-home-manager).
 
+### Secrets
+
+API keys and tokens should not be set via `settings` or `env` — those end up in the Nix store. Use `environmentFiles` instead, which reads secrets at runtime from files in `KEY=VALUE` format.
+
+#### With sops-nix
+
+```nix
+sops.secrets."<server-name>" = {
+  sopsFile = ./secrets.yaml;
+  # File contains: API_KEY=...
+};
+
+services.mcp-servers.servers.<server-name> = {
+  enable = true;
+  environmentFiles = [ config.sops.secrets."<server-name>".path ];
+};
+```
+
+#### With agenix
+
+```nix
+age.secrets."<server-name>".file = ./secrets/<server-name>.age;
+# Decrypted file contains: API_KEY=...
+
+services.mcp-servers.servers.<server-name> = {
+  enable = true;
+  environmentFiles = [ config.age.secrets."<server-name>".path ];
+};
+```
+
+For stdio servers, `environmentFiles` generates a wrapper that sources the files before exec — secrets never appear in `mcp.json`. For HTTP servers, the files are passed to systemd's `EnvironmentFile`.
+
 ## Tool Permissions
 
 The module exposes `config.services.mcp-servers.tools` — an attrset of each enabled server's tool names. Use this to build client-specific auto-approval configs.
@@ -172,6 +204,8 @@ in
 | [sequential-thinking-mcp](https://github.com/modelcontextprotocol/servers) | Sequential thinking | stdio |
 
 | [sympy-mcp](https://github.com/sdiehl/sympy-mcp) | SymPy math | stdio |
+
+| [context7-mcp](https://github.com/upstash/context7) | Context7 library documentation | stdio, http |
 
 All binaries use a unified interface:
 

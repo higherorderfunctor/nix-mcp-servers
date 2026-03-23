@@ -29,17 +29,7 @@
     in {
       default = import ./overlays {inherit inputs;};
       context7-mcp = perPkg "context7-mcp";
-      effect-mcp = perPkg "effect-mcp";
-      mcp-proxy = perPkg "mcp-proxy";
-      fetch-mcp = perPkg "fetch-mcp";
-      github-mcp = perPkg "github-mcp";
-      git-intel-mcp = perPkg "git-intel-mcp";
-      git-mcp = perPkg "git-mcp";
-      kagi-mcp = perPkg "kagi-mcp";
       nixos-mcp = perPkg "nixos-mcp";
-      openmemory-mcp = perPkg "openmemory-mcp";
-      sequential-thinking-mcp = perPkg "sequential-thinking-mcp";
-      sympy-mcp = perPkg "sympy-mcp";
     };
 
     homeManagerModules.default = import ./modules/home-manager.nix;
@@ -53,9 +43,9 @@
       #
       # Example:
       #   mkMcpConfig {
-      #     github-mcp = { type = "stdio"; command = lib.getExe pkgs.github-mcp; args = ["--stdio"]; };
+      #     nixos-mcp = { type = "stdio"; command = lib.getExe pkgs.nixos-mcp; args = ["--stdio"]; };
       #   }
-      #   => { mcpServers = { github-mcp = { ... }; }; }
+      #   => { mcpServers = { nixos-mcp = { ... }; }; }
       mkMcpConfig = servers: {mcpServers = servers;};
 
       # Map a function over every (server, tool) pair in a tools attrset.
@@ -63,8 +53,8 @@
       # Type: (String -> String -> a) -> AttrSet -> [a]
       #
       # Example:
-      #   mapTools (server: tool: "mcp__${server}__${tool}") { github-mcp = ["get_issue"]; }
-      #   => [ "mcp__github-mcp__get_issue" ]
+      #   mapTools (server: tool: "mcp__${server}__${tool}") { nixos-mcp = ["get_issue"]; }
+      #   => [ "mcp__nixos-mcp__get_issue" ]
       mapTools = f: tools:
         nixpkgs.lib.concatLists (nixpkgs.lib.mapAttrsToList
           (server: toolList: map (tool: f server tool) toolList)
@@ -223,7 +213,6 @@
             }
             {
               services.mcp-servers.servers = {
-                fetch-mcp.enable = true;
                 nixos-mcp.enable = true;
               };
             }
@@ -254,17 +243,7 @@
       inherit
         (pkgs)
         context7-mcp
-        effect-mcp
-        mcp-proxy
-        fetch-mcp
-        github-mcp
-        git-intel-mcp
-        git-mcp
-        kagi-mcp
         nixos-mcp
-        openmemory-mcp
-        sequential-thinking-mcp
-        sympy-mcp
         ;
     });
 

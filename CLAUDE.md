@@ -91,10 +91,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | Pattern        | Used for                                                             | Builder                                                         |
 | -------------- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
-| npm            | context7-mcp, git-intel-mcp, openmemory-mcp, sequential-thinking-mcp | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
-| Script         | effect-mcp, sympy-mcp                                                | `stdenv.mkDerivation` or `writeShellApplication`                |
-| Python         | fetch-mcp, git-mcp, kagi-mcp                                         | `python313Packages.buildPythonApplication` with pyproject       |
-| Go             | github-mcp                                                           | `buildGoModule` with vendorHash                                 |
+| npm            | context7-mcp                                                         | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
 
 ### Server Reference
 
@@ -104,24 +101,6 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | nixos-mcp | [flake](https://github.com/utensils/mcp-nixos) | flake main | external flake input | stdio, http | remote | runtime        |
 
 | context7-mcp | [npm](https://www.npmjs.com/package/@upstash/context7-mcp) | npm latest | `buildNpmPackage` | stdio, http | remote | runtime |
-
-| effect-mcp | [npm](https://www.npmjs.com/package/effect-mcp) | npm latest | `stdenv.mkDerivation` | stdio | remote | [source](https://github.com/tim-smart/effect-mcp) |
-
-| fetch-mcp | [PyPI](https://pypi.org/project/mcp-server-fetch/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | remote | runtime |
-
-| git-intel-mcp | [GitHub](https://github.com/hoangsonww/GitIntel-MCP-Server) | master HEAD | `buildNpmPackage` | stdio | local | runtime |
-
-| git-mcp | [PyPI](https://pypi.org/project/mcp-server-git/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | local | runtime |
-
-| github-mcp | [GitHub](https://github.com/github/github-mcp-server) | tagged releases | `buildGoModule` | stdio, http | remote | [README](https://github.com/github/github-mcp-server) |
-
-| kagi-mcp | [PyPI](https://pypi.org/project/kagimcp/) | PyPI latest | `buildPythonApplication` (3.14) | stdio, http | remote | [source](https://github.com/kagisearch/kagi-mcp) |
-
-| openmemory-mcp | [npm](https://www.npmjs.com/package/openmemory-js) | npm latest | `buildNpmPackage` | stdio | remote | [source](https://github.com/CaviraOSS/OpenMemory) |
-
-| sequential-thinking-mcp | [npm](https://www.npmjs.com/package/@modelcontextprotocol/server-sequential-thinking) | npm latest | `buildNpmPackage` | stdio | remote | runtime |
-
-| sympy-mcp | [GitHub](https://github.com/sdiehl/sympy-mcp) | main HEAD | `writeShellApplication` | stdio | remote | runtime |
 
 ### Updating Tool Lists
 
