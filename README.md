@@ -187,6 +187,8 @@ in
 
 | [openmemory-mcp](https://github.com/CaviraOSS/OpenMemory) | OpenMemory long-term memory | stdio |
 
+| [sequential-thinking-mcp](https://github.com/modelcontextprotocol/servers) | Sequential thinking | stdio |
+
 All binaries use a unified interface:
 
 ```sh

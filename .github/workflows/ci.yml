@@ -36,6 +36,7 @@ jobs:
           - github-mcp
           - kagi-mcp
           - openmemory-mcp
+          - sequential-thinking-mcp
           - nixos-mcp
     steps:
       - uses: actions/checkout@v6
