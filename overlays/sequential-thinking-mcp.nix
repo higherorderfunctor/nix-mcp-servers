@@ -1,8 +1,8 @@
-_: final: _: let
+final: let
   nv = final.nv-sources.sequential-thinking-mcp;
-  mkMcpWrapper = final.callPackage ./mk-mcp-wrapper.nix {};
-  unwrapped = final.buildNpmPackage {
-    pname = "sequential-thinking-mcp-unwrapped";
+in
+  final.buildNpmPackage {
+    pname = "sequential-thinking-mcp";
     inherit (nv) version src npmDepsHash;
     sourceRoot = "package";
     postPatch = "cp ${./locks/sequential-thinking-mcp-package-lock.json} package-lock.json";
@@ -12,19 +12,8 @@ _: final: _: let
       runHook preInstall
       mkdir -p $out/lib/sequential-thinking-mcp $out/bin
       cp -r dist node_modules package.json $out/lib/sequential-thinking-mcp/
-      makeWrapper ${final.nodejs}/bin/node $out/bin/sequential-thinking-mcp-unwrapped \
+      makeWrapper ${final.nodejs}/bin/node $out/bin/sequential-thinking-mcp \
         --add-flags "$out/lib/sequential-thinking-mcp/dist/index.js"
       runHook postInstall
     '';
-  };
-in {
-  sequential-thinking-mcp = mkMcpWrapper {
-    name = "sequential-thinking-mcp";
-    inherit (nv) version;
-    pkg = unwrapped;
-    modes = {
-      stdio = "sequential-thinking-mcp-unwrapped";
-      http = "${final.mcp-proxy}/bin/mcp-proxy --port \"$MCP_PORT\" -- sequential-thinking-mcp-unwrapped";
-    };
-  };
-}
+  }

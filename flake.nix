@@ -20,22 +20,7 @@
   } @ inputs: let
     forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
   in {
-    overlays = let
-      inherit (nixpkgs) lib;
-      import' = path: import path {inherit inputs;};
-      sources = import' ./overlays/sources.nix;
-      perPkg = name:
-        lib.composeManyExtensions [sources (import' ./overlays/${name}.nix)];
-    in {
-      default = import ./overlays {inherit inputs;};
-      context7-mcp = perPkg "context7-mcp";
-      effect-mcp = perPkg "effect-mcp";
-      mcp-proxy = perPkg "mcp-proxy";
-      fetch-mcp = perPkg "fetch-mcp";
-      git-intel-mcp = perPkg "git-intel-mcp";
-      git-mcp = perPkg "git-mcp";
-      nixos-mcp = perPkg "nixos-mcp";
-    };
+    overlays.default = import ./overlays {inherit inputs;};
 
     homeManagerModules.default = import ./modules/home-manager.nix;
 
@@ -48,7 +33,7 @@
       #
       # Example:
       #   mkMcpConfig {
-      #     nixos-mcp = { type = "stdio"; command = lib.getExe pkgs.nixos-mcp; args = ["--stdio"]; };
+      #     nixos-mcp = { type = "stdio"; command = lib.getExe pkgs.nix-mcp-servers.nixos-mcp; args = ["--stdio"]; };
       #   }
       #   => { mcpServers = { nixos-mcp = { ... }; }; }
       mkMcpConfig = servers: {mcpServers = servers;};
@@ -71,12 +56,13 @@
       inherit (mcpLib) loadServer;
 
       # Build a single stdio mcp.json entry with validated settings.
+      # Server name is derived from package.pname.
       #
-      # Type: pkgs -> { name, package?, settings?, env?, args?, environmentFiles? } -> AttrSet
+      # Type: pkgs -> { package, settings?, env?, args? } -> AttrSet
       #
       # Example:
-      #   mkStdioEntry pkgs { name = "nixos-mcp"; }
-      #   => { type = "stdio"; command = "/nix/store/...-nixos-mcp/bin/nixos-mcp"; args = [...]; }
+      #   mkStdioEntry pkgs { package = pkgs.nix-mcp-servers.nixos-mcp; }
+      #   => { type = "stdio"; command = "/nix/store/...-nixos-mcp/bin/mcp-nixos"; args = [...]; }
       inherit (mcpLib) mkStdioEntry;
 
       # Build a single http mcp.json entry with validated settings.
@@ -98,6 +84,20 @@
       #   }
       #   => { mcpServers = { nixos-mcp = { ... }; }; }
       inherit (mcpLib) mkStdioConfig;
+
+      # Pre-baked config entries for external HTTP-only MCP servers.
+      # These run on remote infrastructure — no local package or service needed.
+      #
+      # Example:
+      #   mcpServers = {
+      #     inherit (inputs.nix-mcp-servers.lib.externalServers) aws-mcp;
+      #   };
+      externalServers = {
+        aws-mcp = {
+          type = "http";
+          url = "https://knowledge-mcp.global.api.aws";
+        };
+      };
     };
 
     devShells = forAllSystems (system: let
@@ -184,7 +184,7 @@
           overlays = [self.overlays.default];
         };
         entry = self.lib.mkStdioEntry testPkgs {
-          name = "nixos-mcp";
+          package = testPkgs.nix-mcp-servers.nixos-mcp;
         };
         entryJson = builtins.toJSON entry;
       in
@@ -192,7 +192,7 @@
           # Verify mkStdioEntry produces expected fields outside HM
           echo '${entryJson}' | ${pkgs.jq}/bin/jq -e '.type == "stdio"'
           echo '${entryJson}' | ${pkgs.jq}/bin/jq -e '.command | length > 0'
-          echo '${entryJson}' | ${pkgs.jq}/bin/jq -e '.args | length > 0'
+          echo '${entryJson}' | ${pkgs.jq}/bin/jq -e '.args | type == "array"'
           touch $out
         '';
 
@@ -245,16 +245,23 @@
         inherit system;
         overlays = [self.overlays.default];
       };
+      servers = pkgs.nix-mcp-servers;
     in {
+      # Raw packages — flat for CLI ergonomics
       inherit
-        (pkgs)
+        (servers)
         context7-mcp
         effect-mcp
-        mcp-proxy
         fetch-mcp
         git-intel-mcp
         git-mcp
+        github-mcp
+        kagi-mcp
+        mcp-proxy
         nixos-mcp
+        openmemory-mcp
+        sequential-thinking-mcp
+        sympy-mcp
         ;
     });
 

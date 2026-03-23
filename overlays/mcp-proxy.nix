@@ -1,12 +1,12 @@
-_: final: _: let
+final: let
   nv = final.nv-sources.mcp-proxy;
-in {
-  mcp-proxy = final.python313Packages.buildPythonApplication {
+  httpx-auth = final.python314Packages.httpx-auth.overridePythonAttrs {doCheck = false;};
+in
+  final.python314Packages.buildPythonApplication {
     pname = "mcp-proxy";
     inherit (nv) version src;
     pyproject = true;
-    build-system = with final.python313Packages; [setuptools];
-    dependencies = with final.python313Packages; [httpx-auth mcp uvicorn];
+    build-system = with final.python314Packages; [setuptools];
+    dependencies = with final.python314Packages; [mcp uvicorn] ++ [httpx-auth];
     doCheck = false;
-  };
-}
+  }

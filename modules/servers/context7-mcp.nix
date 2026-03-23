@@ -6,15 +6,29 @@
   inherit (lib) mkOption types optionalAttrs optionals;
 in {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "context7-mcp --transport stdio";
+      http = "context7-mcp --transport http";
+    };
     scope = "remote";
     defaultPort = 19750;
-    credentialVars = {credentials = "CONTEXT7_API_KEY";};
+    credentialVars = {
+      credentials = {
+        envVar = "CONTEXT7_API_KEY";
+        required = false;
+      };
+    };
     tools = ["query-docs" "resolve-library-id"];
   };
 
   settingsOptions = {
     credentials = mcpLib.mkCredentialsOption "CONTEXT7_API_KEY";
+
+    path = mkOption {
+      type = types.str;
+      default = "/mcp";
+      description = "HTTP endpoint path. Only used in HTTP mode.";
+    };
 
     apiUrl = mkOption {
       type = types.nullOr types.str;

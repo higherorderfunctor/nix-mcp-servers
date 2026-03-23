@@ -2,7 +2,7 @@
   inherit (lib) mkOption types;
 in {
   meta = {
-    modes = ["http"];
+    modes = {http = "external";};
     scope = "remote";
     defaultPort = null;
     external = true;

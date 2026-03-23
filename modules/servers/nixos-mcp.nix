@@ -7,7 +7,10 @@
     else "false";
 in {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "mcp-nixos";
+      http = "env MCP_NIXOS_TRANSPORT=http mcp-nixos";
+    };
     scope = "remote";
     defaultPort = 19752;
     tools = ["nix" "nix_versions"];

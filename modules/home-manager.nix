@@ -9,7 +9,6 @@
     concatStringsSep
     escapeShellArg
     filterAttrs
-    getExe
     map
     mapAttrs
     mapAttrs'
@@ -18,7 +17,7 @@
     mkOption
     nameValuePair
     optionalAttrs
-    optionals
+    optionalString
     types
     ;
 
@@ -36,9 +35,14 @@
     context7-mcp = ./servers/context7-mcp.nix;
     effect-mcp = ./servers/effect-mcp.nix;
     fetch-mcp = ./servers/fetch-mcp.nix;
+    github-mcp = ./servers/github-mcp.nix;
     git-intel-mcp = ./servers/git-intel-mcp.nix;
     git-mcp = ./servers/git-mcp.nix;
+    kagi-mcp = ./servers/kagi-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
+    openmemory-mcp = ./servers/openmemory-mcp.nix;
+    sequential-thinking-mcp = ./servers/sequential-thinking-mcp.nix;
+    sympy-mcp = ./servers/sympy-mcp.nix;
   };
 
   # ── Per-server submodule ───────────────────────────────────────────
@@ -76,8 +80,8 @@
       // optionalAttrs (!(isExternal serverDef)) {
         package = mkOption {
           type = types.package;
-          default = pkgs.${name};
-          defaultText = lib.literalExpression "pkgs.${name}";
+          default = pkgs.nix-mcp-servers.${name};
+          defaultText = lib.literalExpression "pkgs.nix-mcp-servers.${name}";
           description = "The ${name} package to use.";
         };
 
@@ -111,6 +115,7 @@
   # ── Delegate entry building to lib ─────────────────────────────────
   mkHttpEntry = name: srv: let
     serverDef = serverFiles.${name};
+    isBridge = (serverDef.meta.modes.http or "") == "bridge";
     baseEntry = mcpLib.mkHttpEntry ({
         inherit name;
         settings = srv.settings;
@@ -118,17 +123,57 @@
       // optionalAttrs (!(isExternal serverDef)) {
         inherit (srv.service) port host;
       });
+  in
+    # Bridge servers use mcp-proxy which serves on /mcp
+    if isBridge && !(srv.settings ? path)
+    then baseEntry // {url = baseEntry.url + "/mcp";}
+    else baseEntry;
+
+  # ── Build ExecStart for systemd services ───────────────────────────
+  # Uses meta.modes to determine how to invoke the server.
+  # "bridge" means use mcp-proxy to bridge stdio → HTTP.
+  # Uses writeShellApplication with runtimeInputs for isolated PATH.
+  mkExecStart = name: srv: let
+    serverDef = serverFiles.${name};
+    modes = serverDef.meta.modes;
+    httpCmd = modes.http;
+    stdioCmdForBridge = modes.stdio;
+
+    # For bridge servers, the actual server runs in stdio mode —
+    # use "stdio" to avoid http-only args like --port
+    effectiveMode =
+      if httpCmd == "bridge"
+      then "stdio"
+      else "http";
+    srvArgs = effectiveArgs name srv effectiveMode;
+    argsStr = concatStringsSep " " (map escapeShellArg srvArgs);
     credVars = credentialVarsFor name;
     evaluatedSettings = mcpLib.evalSettings name srv.settings;
     hasCreds = mcpLib.hasCredentials credVars evaluatedSettings;
-    usesHeaderAuth = (serverDef.meta.httpAuth or null) == "header";
-    # Generate a headersHelper script for servers with client-side header auth
-    headersHelper = mcpLib.mkHeadersHelper pkgs name credVars evaluatedSettings;
-  in
-    baseEntry
-    // optionalAttrs (usesHeaderAuth && hasCreds) {
-      inherit headersHelper;
+
+    credSnippet =
+      if hasCreds
+      then mcpLib.mkCredentialsSnippet credVars evaluatedSettings
+      else "";
+
+    rawCmd =
+      if httpCmd == "bridge"
+      then "mcp-proxy --pass-environment --port \"$MCP_PORT\" -- ${stdioCmdForBridge}"
+      else httpCmd;
+
+    wrapper = pkgs.writeShellApplication {
+      name = "mcp-" + name + "-start";
+      bashOptions = ["errexit" "nounset" "pipefail" "errtrace" "functrace"];
+      runtimeInputs =
+        [srv.package]
+        ++ lib.optionals (httpCmd == "bridge") [pkgs.nix-mcp-servers.mcp-proxy];
+      text = ''
+        ${credSnippet}
+        exec ${rawCmd}${optionalString (argsStr != "") " ${argsStr}"}
+      '';
     };
+  in
+    lib.getExe wrapper;
 
   # ── Effective env/args for systemd services ────────────────────────
   effectiveEnv = name: srv: mode: let
@@ -164,10 +209,8 @@ in {
       internal = true;
       description = ''
         Generated mcp.json-compatible configuration from enabled servers.
-        Reference as `config.services.mcp-servers.mcpConfig` from other modules, e.g.:
-
-            home.file.".config/claude/mcp.json".text =
-              builtins.toJSON config.services.mcp-servers.mcpConfig;
+        All HTTP servers produce plain { type = "http"; url = "..."; } entries.
+        Reference as `config.services.mcp-servers.mcpConfig` from other modules.
       '';
     };
 
@@ -184,39 +227,42 @@ in {
 
   # ── Implementation ─────────────────────────────────────────────────
   config = {
-    services.mcp-servers.mcpConfig.mcpServers =
-      mapAttrs mkHttpEntry enabledServers;
+    services.mcp-servers = {
+      mcpConfig.mcpServers = mapAttrs mkHttpEntry enabledServers;
+      tools = mapAttrs (name: _: serverFiles.${name}.meta.tools or []) enabledServers;
+    };
 
-    services.mcp-servers.tools =
-      mapAttrs (name: _: serverFiles.${name}.meta.tools or []) enabledServers;
-
-    assertions = [];
+    assertions = let
+      # Generate credential assertions for all enabled servers
+      credAssertions = lib.concatLists (mapAttrsToList (name: srv: let
+        serverDef = serverFiles.${name};
+        credVars = serverDef.meta.credentialVars or {};
+        evaluatedSettings = mcpLib.evalSettings name srv.settings;
+      in
+        lib.concatLists (mapAttrsToList (optName: spec: let
+          cred = evaluatedSettings.${optName};
+          hasFile = (cred.file or null) != null;
+          hasHelper = (cred.helper or null) != null;
+        in
+          # Mutual exclusion: file and helper cannot both be set
+          [
+            {
+              assertion = !(hasFile && hasHelper);
+              message = "services.mcp-servers.servers.${name}.settings.${optName}: set either file or helper, not both";
+            }
+          ]
+          # Required: must have file or helper
+          ++ lib.optional spec.required {
+            assertion = hasFile || hasHelper;
+            message = "services.mcp-servers.servers.${name}.settings.${optName}: credentials are required (set file or helper)";
+          })
+        credVars))
+      enabledServers);
+    in
+      credAssertions;
 
     systemd.user.services = mapAttrs' (name: srv: let
       srvEnv = effectiveEnv name srv "http";
-      srvArgs = effectiveArgs name srv "http";
-      credVars = credentialVarsFor name;
-      evaluatedSettings = mcpLib.evalSettings name srv.settings;
-      serverDef = serverFiles.${name};
-      usesHeaderAuth = (serverDef.meta.httpAuth or null) == "header";
-      # Only inject credentials into the service env for servers without client-side header auth
-      hasCreds = !usesHeaderAuth && mcpLib.hasCredentials credVars evaluatedSettings;
-      baseCmd = concatStringsSep " " (
-        map escapeShellArg (
-          [(getExe srv.package) "--http"]
-          ++ optionals (srvArgs != []) (["--"] ++ srvArgs)
-        )
-      );
-      execStart =
-        if hasCreds
-        then
-          toString (pkgs.writeShellScript ("mcp-" + name + "-start") ''
-            set -euETo pipefail
-            shopt -s inherit_errexit 2>/dev/null || :
-            ${mcpLib.mkCredentialsSnippet credVars evaluatedSettings}
-            exec ${baseCmd}
-          '')
-        else baseCmd;
     in
       nameValuePair ("mcp-" + name) {
         Unit = {
@@ -225,7 +271,7 @@ in {
         };
         Service = {
           Type = "simple";
-          ExecStart = execStart;
+          ExecStart = mkExecStart name srv;
           Restart = "on-failure";
           RestartSec = 5;
           Environment =

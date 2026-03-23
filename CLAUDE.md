@@ -4,20 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-nix-mcp-servers is a Nix flake that packages Model Context Protocol (MCP) servers as Nix derivations with a unified CLI interface. It provides a composable overlay, per-package overlays, and a Home Manager module for declarative configuration.
+nix-mcp-servers is a Nix flake that packages Model Context Protocol (MCP) servers as Nix derivations. It provides a namespaced overlay (`pkgs.nix-mcp-servers.*`), optional normalized wrappers (`pkgs.nix-mcp-servers.normalized.*`), and a Home Manager module for declarative configuration.
 
 ## Build & Validation Commands
 
 ```bash
 nix flake show                # List all outputs (quick validation)
 nix build .#<package-name>    # Build a specific package (e.g., .#context7-mcp)
-nix flake check               # Full flake evaluation check
+nix flake check               # Full flake evaluation check (linters + eval, does NOT build packages)
 nix develop                   # Enter devShell with all packages available
 nix run .#update              # Full update pipeline: flake inputs, nvfetcher, locks, hashes
 nix fmt                       # Format all Nix files with alejandra
 ```
 
+**Important:** `nix flake check` only runs linters and evaluation tests — it does **not** build packages. After any change to overlays, package definitions, or dependencies, always run `nix build .#<package>` on affected packages to verify they actually build. For broad changes, build all packages.
+
+After any change to server modules, lib, or the HM module: restart affected systemd services and verify they respond on their configured port. Build checks do not catch runtime failures (wrong port, missing CLI flags, env var issues).
+
 CI runs `nix flake check` and a per-package build matrix on every PR and push to main.
+
+When debugging or fixing issues, prefer the correct architectural fix over quick workarounds. If an upstream server supports a feature natively (e.g., HTTP transport), investigate how to use it properly instead of falling back to bridge/proxy. When unsure whether a fix is correct or a shortcut, ask the user before implementing. Quick hacks accumulate technical debt and mask the real integration requirements. Priority order: official native support > bridge/proxy > patch upstream code.
+
+All packages from the overlay are available in the devShell (`nix develop`). Use the devShell to test changes interactively instead of digging through `/nix/store` paths. Reload with `direnv reload` or re-enter with `nix develop` after changes.
 
 ## Architecture
 
@@ -25,7 +33,7 @@ CI runs `nix flake check` and a per-package build matrix on every PR and push to
 
 - **flake.nix** — Defines inputs, composes the overlay, exports packages, devShell, `lib`, and `homeManagerModules.default`.
 - **lib/default.nix** — Core library: settings validation (`evalSettings`), entry builders (`mkStdioEntry`, `mkHttpEntry`, `mkStdioConfig`). Loads server definitions on demand via `loadServer` — no centralized server list. Works standalone without Home Manager.
-- **overlays/default.nix** — Composes all per-package overlays via `lib.composeManyExtensions`.
+- **overlays/default.nix** — Single overlay adding `pkgs.nix-mcp-servers` namespace (raw packages + `normalized` sub-attrset).
 - **overlays/sources.nix** — Overlay that exposes `final.nv-sources.<name>` from nvfetcher's `generated.nix` merged with `hashes.json`.
 - **modules/home-manager.nix** — Home Manager service layer: options, systemd services, assertions. Delegates entry building and settings validation to `lib/`.
 - **overlays/mk-mcp-wrapper.nix** — Shared wrapper that gives every server a uniform `--stdio` / `--http` CLI.
@@ -85,32 +93,33 @@ Defined in `apps/update.nix` wrapping `apps/update.sh` via `writeShellApplicatio
 
 ### Package Build Patterns
 
-Every package follows a two-layer pattern: build an `unwrapped` derivation, then wrap it with `mkMcpWrapper`.
+Every package follows a two-layer pattern: the overlay builds a raw package, the HM module or lib wraps it for the target transport.
 
 <!-- dprint-ignore -->
 | Pattern        | Used for                                                             | Builder                                                         |
 | -------------- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
-| npm            | context7-mcp, git-intel-mcp                                          | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
-| Script         | effect-mcp                                                           | `stdenv.mkDerivation` or `writeShellApplication`                |
-| Python         | fetch-mcp, git-mcp                                                   | `python313Packages.buildPythonApplication` with pyproject       |
+| npm            | context7-mcp, git-intel-mcp, openmemory-mcp, sequential-thinking-mcp | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
+| Script         | effect-mcp, sympy-mcp                                                | `stdenv.mkDerivation` or `writeShellApplication`                |
+| Python         | fetch-mcp, git-mcp, kagi-mcp, mcp-proxy                              | `python314Packages.buildPythonApplication` with pyproject       |
+| Go             | github-mcp                                                           | `buildGoModule` with vendorHash                                 |
 
 ### Server Reference
 
 <!-- dprint-ignore -->
-| Package   | Upstream                                       | Track      | Builder              | Transport   | Scope  | Tool Discovery |
-| --------- | ---------------------------------------------- | ---------- | -------------------- | ----------- | ------ | -------------- |
-| nixos-mcp | [flake](https://github.com/utensils/mcp-nixos) | flake main | external flake input | stdio, http | remote | runtime        |
-
-| context7-mcp | [npm](https://www.npmjs.com/package/@upstash/context7-mcp) | npm latest | `buildNpmPackage` | stdio, http | remote | runtime |
-
-| effect-mcp | [npm](https://www.npmjs.com/package/effect-mcp) | npm latest | `stdenv.mkDerivation` | stdio | remote | [source](https://github.com/tim-smart/effect-mcp) |
-
-| fetch-mcp | [PyPI](https://pypi.org/project/mcp-server-fetch/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | remote | runtime |
-
+| Package | Upstream | Track | Builder | Transport | Scope | Tool Discovery |
+| ------- | -------- | ----- | ------- | --------- | ----- | -------------- |
+| context7-mcp | [npm](https://www.npmjs.com/package/@upstash/context7-mcp) | npm latest | `buildNpmPackage` | stdio, http (native) | remote | runtime |
+| effect-mcp | [npm](https://www.npmjs.com/package/effect-mcp) | npm latest | `stdenv.mkDerivation` | stdio, http (bridge) | remote | [source](https://github.com/tim-smart/effect-mcp) |
+| fetch-mcp | [PyPI](https://pypi.org/project/mcp-server-fetch/) | PyPI latest | `buildPythonApplication` (3.14) | stdio, http (bridge) | remote | runtime |
 | git-intel-mcp | [GitHub](https://github.com/hoangsonww/GitIntel-MCP-Server) | master HEAD | `buildNpmPackage` | stdio | local | runtime |
-
-| git-mcp | [PyPI](https://pypi.org/project/mcp-server-git/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | local | runtime |
+| git-mcp | [PyPI](https://pypi.org/project/mcp-server-git/) | PyPI latest | `buildPythonApplication` (3.14) | stdio | local | runtime |
+| github-mcp | [GitHub](https://github.com/github/github-mcp-server) | tagged releases | `buildGoModule` | stdio | remote | runtime |
+| kagi-mcp | [PyPI](https://pypi.org/project/kagimcp/) | PyPI latest | `buildPythonApplication` (3.14) | stdio | remote | runtime |
+| nixos-mcp | [flake](https://github.com/utensils/mcp-nixos) | flake main | external flake input | stdio, http (native) | remote | runtime |
+| openmemory-mcp | [npm](https://www.npmjs.com/package/openmemory-js) | npm latest | `buildNpmPackage` | stdio, http (native) | remote | runtime |
+| sequential-thinking-mcp | [npm](https://www.npmjs.com/package/@modelcontextprotocol/server-sequential-thinking) | npm latest | `buildNpmPackage` | stdio, http (bridge) | remote | runtime |
+| sympy-mcp | [GitHub](https://github.com/sdiehl/sympy-mcp) | main HEAD | `writeShellApplication` | stdio, http (bridge) | remote | runtime |
 
 ### Updating Tool Lists
 
@@ -141,7 +150,7 @@ printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion
 3. Run `nvfetcher` to regenerate `overlays/.nvfetcher/generated.nix` and `generated.json`
 4. Create `overlays/<name>.nix` — access sources via `final.nv-sources.<key>`, build unwrapped, wrap with `mkMcpWrapper` (pass `version`, specify `stdio` and optionally `http` modes)
 5. Add overlay to the list in `overlays/default.nix` (alphabetical)
-6. Add per-package overlay export in `flake.nix` (`overlays.<name>`, alphabetical)
+6. Add package to `overlays/default.nix` raw + normalized sections (alphabetical)
 7. Add package to `packages` inherit list in `flake.nix` (alphabetical)
 8. Create `modules/servers/<name>.nix` with `meta` (`modes`, `scope`, `defaultPort`, `tools`), `settingsOptions`, `settingsToEnv`, `settingsToArgs`
 9. Register the server module in `modules/home-manager.nix` (`serverFiles` attrset, alphabetical)
@@ -151,7 +160,8 @@ printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion
 13. Add row to CLAUDE.md Server Reference table (alphabetical)
 14. Add package to CI build matrix in `.github/workflows/ci.yml` (alphabetical)
 15. If server requires auth to start: add env var to `.github/workflows/update.yml` and document the required secret
-16. Run `nix flake check` to verify linting and evaluation
+16. Update `.claude/settings.json` — add `mcp__plugin_claude-code-home-manager_<name>__*` wildcard allow entry so MCP tools work without prompting
+17. Run `nix flake check` to verify linting and evaluation
 
 ## Code Quality
 
@@ -195,9 +205,9 @@ All code must pass the project linters before committing. Run from the devShell:
 
 Enabling a server (`servers.<name>.enable = true`) creates a systemd HTTP service and an HTTP entry in `mcpConfig`. All packaged servers support HTTP (native or via mcp-proxy bridge).
 
-Packaged servers have options: `enable`, `package`, `service.port`, `service.host`, `settings`, `env`, `args`, `environmentFiles`. External servers (e.g., `aws-mcp`) have no `package` or `service` options — they generate HTTP-only mcpConfig entries from `settings.url`.
+Packaged servers have options: `enable`, `package`, `service.port`, `service.host`, `settings`, `env`, `args`. External HTTP-only servers (e.g., `aws-mcp`) are not part of the HM module — use `lib.externalServers` to get pre-baked config entries.
 
-Secrets must use `environmentFiles` (list of paths to `KEY=VALUE` files read at runtime), not `settings` or `env` which end up in the Nix store. The files are passed to systemd `EnvironmentFile`.
+Secrets use the `credentials` system — servers that need auth declare `credentials` in `settingsOptions` via `mkCredentialsOption`. Users set `settings.credentials.file` (path to raw secret) or `settings.credentials.helper` (executable outputting the secret). Credentials are injected at runtime via systemd environment, never stored in the Nix store.
 
 For stdio-only configs (devShells, non-HM systems), use `lib.mkStdioConfig` or `lib.mkStdioEntry` directly — these are standalone lib functions, not part of the HM module.
 

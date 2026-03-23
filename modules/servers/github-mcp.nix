@@ -67,11 +67,18 @@
   toolsetType = types.either (types.enum knownToolsets) types.str;
 in {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "github-mcp-server stdio";
+      http = "bridge";
+    };
     scope = "remote";
     defaultPort = 19751;
-    credentialVars = {credentials = "GITHUB_PERSONAL_ACCESS_TOKEN";};
-    httpAuth = "header";
+    credentialVars = {
+      credentials = {
+        envVar = "GITHUB_PERSONAL_ACCESS_TOKEN";
+        required = true;
+      };
+    };
     tools = knownTools;
   };
 
@@ -104,8 +111,8 @@ in {
 
     dynamicToolsets = mkOption {
       type = types.bool;
-      default = true;
-      description = "Enable dynamic toolsets discovery.";
+      default = false;
+      description = "Enable dynamic toolsets discovery. When false (default), all tools from configured toolsets are available at startup. When true, only meta-tools are advertised initially and toolsets must be enabled at runtime — requires client support for tools/list_changed notifications.";
     };
 
     readOnly = mkOption {

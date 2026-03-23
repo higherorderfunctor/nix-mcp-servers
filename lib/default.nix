@@ -8,8 +8,6 @@
     mapAttrs
     mapAttrsToList
     mkOption
-    optionalAttrs
-    optionals
     types
     ;
 
@@ -91,7 +89,7 @@
     };
 
   # ── Credentials helpers ──────────────────────────────────────────
-  # credentialVars: { settingsOptionName = "ENV_VAR"; } from meta.credentialVars
+  # credentialVars: { settingsOptionName = { envVar = "ENV_VAR"; required = bool; }; }
   # settings: evaluated settings attrset — credentialVars keys are looked up here
 
   hasCredentials = credentialVars: settings:
@@ -102,71 +100,80 @@
     (builtins.attrNames credentialVars);
 
   mkCredentialsSnippet = credentialVars: settings:
-    concatStringsSep "\n" (mapAttrsToList (optName: envVar: let
+    concatStringsSep "\n" (mapAttrsToList (optName: spec: let
       cred = settings.${optName};
+      envVar = spec.envVar;
     in
       if cred.helper or null != null
-      then ''export ${envVar}="$("${cred.helper}")"''
+      then ''
+        ${envVar}="$("${cred.helper}")"
+        export ${envVar}''
       else if cred.file or null != null
-      then ''export ${envVar}="$(cat "${cred.file}")"''
+      then ''
+        ${envVar}="$(cat "${cred.file}")"
+        export ${envVar}''
       else "")
     credentialVars);
 
-  # ── Headers helper for HTTP servers with client-side auth ──────────
-  # Generates a script that outputs JSON headers for MCP clients.
-  # The first credential is used as a Bearer token in the Authorization header.
-  mkHeadersHelper = pkgs: name: credentialVars: settings: let
-    # Use the first credential entry that has a value set
-    firstCredName = builtins.head (builtins.attrNames credentialVars);
-    cred = settings.${firstCredName};
-    readToken =
-      if cred.helper or null != null
-      then ''"$("${cred.helper}")"''
-      else if cred.file or null != null
-      then ''"$(cat "${cred.file}")"''
-      else ''""'';
-  in
-    toString (pkgs.writeShellScript ("mcp-" + name + "-headers") ''
-      set -euETo pipefail
-      shopt -s inherit_errexit 2>/dev/null || :
-      TOKEN=${readToken}
-      printf '{"Authorization": "Bearer %s"}\n' "$TOKEN"
-    '');
-
   # ── Secrets wrapper for stdio servers with credentials ─────────────
-  mkSecretsWrapper = pkgs: name: package: credentialVars: settings:
-    pkgs.writeShellScript (name + "-env") ''
+  # Returns a string (store path) for use directly as a command.
+  mkSecretsWrapper = {
+    pkgs,
+    name,
+    package,
+    credentialVars,
+    settings,
+  }: let
+    drv = pkgs.writeShellScript (name + "-env") ''
       set -euETo pipefail
       shopt -s inherit_errexit 2>/dev/null || :
       ${mkCredentialsSnippet credentialVars settings}
       exec "${getExe package}" "$@"
     '';
+  in "${drv}";
 
   # ── mcp.json entry builders ─────────────────────────────────────
   mkStdioEntry = pkgs: {
-    name,
-    package ? pkgs.${name},
+    package,
+    name ? package.passthru.mcpName or package.pname,
     settings ? {},
     env ? {},
     args ? [],
   }: let
     serverDef = loadServer name;
+    # Mode string is e.g. "github-mcp-server stdio" — split into parts,
+    # drop the binary name (first element), keep only subcommand/flags
+    stdioParts = lib.splitString " " serverDef.meta.modes.stdio;
+    stdioArgs = builtins.tail stdioParts;
     evaluatedSettings = evalSettings name settings;
     cfgShim = mkCfgShim {inherit evaluatedSettings;};
     srvEnv = effectiveEnv name cfgShim "stdio" env;
     srvArgs = effectiveArgs name cfgShim "stdio" args;
     credentialVars = serverDef.meta.credentialVars or {};
     needsWrapper = hasCredentials credentialVars evaluatedSettings;
+    wrappedCommand = mkSecretsWrapper {
+      inherit pkgs name package credentialVars;
+      settings = evaluatedSettings;
+    };
   in
     {
       type = "stdio";
       command =
         if needsWrapper
-        then toString (mkSecretsWrapper pkgs name package credentialVars evaluatedSettings)
+        then wrappedCommand
         else getExe package;
-      args = ["--stdio"] ++ optionals (srvArgs != []) (["--"] ++ srvArgs);
+      args = stdioArgs ++ srvArgs;
     }
-    // optionalAttrs (srvEnv != {}) {env = srvEnv;};
+    # Prevent Python path pollution from parent process (e.g., nixos-mcp
+    # sets PYTHONPATH for Python 3.13 which breaks Python 3.14 servers)
+    // {
+      env =
+        srvEnv
+        // {
+          PYTHONPATH = "";
+          PYTHONNOUSERSITE = "true";
+        };
+    };
 
   mkHttpEntry = {
     name,
@@ -194,9 +201,9 @@
 
   # ── Convenience: multiple servers at once ──────────────────────────
   mkStdioConfig = pkgs: serverConfigs: {
-    mcpServers =
-      mapAttrs (name: cfg: mkStdioEntry pkgs ({inherit name;} // cfg))
-      serverConfigs;
+    mcpServers = mapAttrs (name: cfg:
+      mkStdioEntry pkgs ({package = pkgs.nix-mcp-servers.${name};} // cfg))
+    serverConfigs;
   };
 in {
   inherit
@@ -209,7 +216,6 @@ in {
     mkCfgShim
     mkCredentialsOption
     mkCredentialsSnippet
-    mkHeadersHelper
     mkHttpEntry
     mkSecretsWrapper
     mkStdioConfig

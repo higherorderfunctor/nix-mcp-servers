@@ -6,12 +6,21 @@
   inherit (lib) mkOption types optionalAttrs;
 in {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "openmemory-mcp";
+      http = "openmemory-mcp-serve";
+    };
     scope = "remote";
     defaultPort = 19758;
     credentialVars = {
-      credentials = "OM_API_KEY";
-      openaiCredentials = "OPENAI_API_KEY";
+      credentials = {
+        envVar = "OM_API_KEY";
+        required = false;
+      };
+      openaiCredentials = {
+        envVar = "OPENAI_API_KEY";
+        required = false;
+      };
     };
     tools = ["openmemory_delete" "openmemory_get" "openmemory_list" "openmemory_query" "openmemory_reinforce" "openmemory_store"];
   };
@@ -19,6 +28,12 @@ in {
   settingsOptions = {
     credentials = mcpLib.mkCredentialsOption "OM_API_KEY";
     openaiCredentials = mcpLib.mkCredentialsOption "OPENAI_API_KEY";
+
+    path = mkOption {
+      type = types.str;
+      default = "/mcp";
+      description = "HTTP endpoint path. Only used in HTTP mode.";
+    };
 
     tier = mkOption {
       type = types.enum ["hybrid" "fast" "smart" "deep"];
@@ -51,9 +66,12 @@ in {
     };
   };
 
-  settingsToEnv = cfg: _mode:
+  settingsToEnv = cfg: mode:
     {
       OM_TIER = cfg.settings.tier;
+    }
+    // optionalAttrs (mode == "http") {
+      OM_PORT = toString cfg.service.port;
     }
     // optionalAttrs (cfg.settings.embeddingsProvider != null) {
       OM_EMBEDDINGS = cfg.settings.embeddingsProvider;
