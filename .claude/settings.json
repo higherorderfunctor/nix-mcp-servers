@@ -1,4 +1,29 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "mcp__plugin_claude-code-home-manager_aws-mcp__*",
+      "mcp__plugin_claude-code-home-manager_context7-mcp__*",
+      "mcp__plugin_claude-code-home-manager_effect-mcp__*",
+      "mcp__plugin_claude-code-home-manager_fetch-mcp__*",
+      "mcp__plugin_claude-code-home-manager_git-intel-mcp__*",
+      "mcp__plugin_claude-code-home-manager_git-mcp__*",
+      "mcp__plugin_claude-code-home-manager_github-mcp__*",
+      "mcp__plugin_claude-code-home-manager_kagi-mcp__*",
+      "mcp__plugin_claude-code-home-manager_nixos-mcp__*",
+      "mcp__plugin_claude-code-home-manager_openmemory-mcp__*",
+      "mcp__plugin_claude-code-home-manager_sequential-thinking-mcp__*",
+      "mcp__plugin_claude-code-home-manager_sympy-mcp__*"
+    ],
+    "ask": [
+      "Edit(.claude/settings.json)",
+      "Edit(.claude/settings.local.json)",
+      "Write(.claude/settings.json)",
+      "Write(.claude/settings.local.json)"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {

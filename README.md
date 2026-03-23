@@ -15,16 +15,13 @@ Add as a flake input:
 }
 ```
 
-Apply the overlay:
+Apply the overlay — packages are namespaced under `pkgs.nix-mcp-servers`:
 
 ```nix
 overlays = [ inputs.nix-mcp-servers.overlays.default ];
-```
 
-To use a single server's overlay instead of all:
-
-```nix
-overlays = [ inputs.nix-mcp-servers.overlays."<server-name>" ];
+# Raw packages: pkgs.nix-mcp-servers.github-mcp
+# Normalized (--stdio/--http/--version wrapper): pkgs.nix-mcp-servers.normalized.github-mcp
 ```
 
 ### Binary cache
@@ -71,35 +68,46 @@ For stdio-only configs (devShells, non-HM systems), use `lib.mkStdioConfig` or `
 
 ### Secrets
 
-API keys and tokens should not be set via `settings` or `env` — those end up in the Nix store. Use `environmentFiles` instead, which reads secrets at runtime from files in `KEY=VALUE` format.
+API keys and tokens should not be set via `settings` or `env` — those end up in the Nix store. Servers that need credentials declare a `credentials` option with `file` (path to raw secret) or `helper` (executable that outputs the raw secret on stdout).
 
 #### With sops-nix
 
 ```nix
-sops.secrets."<server-name>" = {
+sops.secrets."github-token" = {
   sopsFile = ./secrets.yaml;
-  # File contains: API_KEY=...
+  # File contains the raw token value (not KEY=VALUE)
 };
 
-services.mcp-servers.servers.<server-name> = {
+services.mcp-servers.servers.github-mcp = {
   enable = true;
-  environmentFiles = [ config.sops.secrets."<server-name>".path ];
+  settings.credentials.file = config.sops.secrets."github-token".path;
 };
 ```
 
 #### With agenix
 
 ```nix
-age.secrets."<server-name>".file = ./secrets/<server-name>.age;
-# Decrypted file contains: API_KEY=...
+age.secrets."github-token".file = ./secrets/github-token.age;
+# Decrypted file contains the raw token value
 
-services.mcp-servers.servers.<server-name> = {
+services.mcp-servers.servers.github-mcp = {
   enable = true;
-  environmentFiles = [ config.age.secrets."<server-name>".path ];
+  settings.credentials.file = config.age.secrets."github-token".path;
 };
 ```
 
-For stdio servers, `environmentFiles` generates a wrapper that sources the files before exec — secrets never appear in `mcp.json`. For HTTP servers, the files are passed to systemd's `EnvironmentFile`.
+#### With a credential helper
+
+```nix
+services.mcp-servers.servers.github-mcp = {
+  enable = true;
+  settings.credentials.helper = pkgs.writeShellScript "get-token" ''
+    cat /run/secrets/github-token
+  '';
+};
+```
+
+Credentials are injected at runtime — the raw value never appears in the Nix store or `mcp.json`. For systemd HTTP services, credentials are exported as environment variables. For stdio entries via `mkStdioEntry`, a wrapper script bakes them into the command.
 
 ## Tool Permissions
 
@@ -167,9 +175,11 @@ For servers that need secrets at runtime:
 ```nix
 mcpConfig.mcpServers.github-mcp =
   inputs.nix-mcp-servers.lib.mkStdioEntry pkgs {
-    name = "github-mcp";
-    environmentFiles = [ "/run/secrets/github-token" ];
-    settings = { readOnly = true; };
+    package = pkgs.nix-mcp-servers.github-mcp;
+    settings = {
+      credentials.file = "/run/secrets/github-token";
+      readOnly = true;
+    };
   };
 ```
 
@@ -182,7 +192,7 @@ let
   mcp = inputs.nix-mcp-servers.lib.mkMcpConfig {
     <server-name> = {
       type = "stdio";
-      command = lib.getExe pkgs.<server-name>;
+      command = lib.getExe pkgs.nix-mcp-servers.<server-name>;
       args = [ "--stdio" ];
     };
   };
@@ -192,42 +202,36 @@ in
 
 ## Available Servers
 
-| Server                                                    | Description                          | Transport   |
-| --------------------------------------------------------- | ------------------------------------ | ----------- |
-| [nixos-mcp](https://github.com/utensils/mcp-nixos)        | NixOS / Home Manager / nix ecosystem | stdio, http |
-| [github-mcp](https://github.com/github/github-mcp-server) | GitHub API                           | stdio, http |
-
-| [kagi-mcp](https://github.com/kagisearch/kagi-mcp) | Kagi search and summarization | stdio, http |
-
-| [openmemory-mcp](https://github.com/CaviraOSS/OpenMemory) | OpenMemory long-term memory | stdio |
-
-| [sequential-thinking-mcp](https://github.com/modelcontextprotocol/servers) | Sequential thinking | stdio |
-
-| [sympy-mcp](https://github.com/sdiehl/sympy-mcp) | SymPy math | stdio |
-
-| [context7-mcp](https://github.com/upstash/context7) | Context7 library documentation | stdio, http |
-
-| [effect-mcp](https://github.com/tim-smart/effect-mcp) | Effect documentation | stdio |
-
-| [fetch-mcp](https://github.com/modelcontextprotocol/servers) | HTTP fetch and content extraction | stdio |
-
+<!-- dprint-ignore -->
+| Server | Description | Transport |
+| ------ | ----------- | --------- |
+| [context7-mcp](https://github.com/upstash/context7) | Context7 library documentation | stdio, http (native) |
+| [effect-mcp](https://github.com/tim-smart/effect-mcp) | Effect documentation | stdio, http (bridge) |
+| [fetch-mcp](https://github.com/modelcontextprotocol/servers) | HTTP fetch and content extraction | stdio, http (bridge) |
 | [git-intel-mcp](https://github.com/hoangsonww/GitIntel-MCP-Server) | Git repository analytics | stdio (local) |
-
 | [git-mcp](https://github.com/modelcontextprotocol/servers) | Git repository operations | stdio (local) |
+| [github-mcp](https://github.com/github/github-mcp-server) | GitHub API | stdio |
+| [kagi-mcp](https://github.com/kagisearch/kagimcp) | Kagi search and summarization | stdio |
+| [nixos-mcp](https://github.com/utensils/mcp-nixos) | NixOS / Home Manager / nix ecosystem | stdio, http (native) |
+| [openmemory-mcp](https://github.com/CaviraOSS/OpenMemory) | OpenMemory long-term memory | stdio, http (bridge) |
+| [sequential-thinking-mcp](https://github.com/modelcontextprotocol/servers) | Sequential thinking | stdio, http (bridge) |
+| [sympy-mcp](https://github.com/sdiehl/sympy-mcp) | SymPy math | stdio, http (bridge) |
 
-All binaries use a unified interface:
+- **native**: server has built-in HTTP support
+- **bridge**: HTTP via [mcp-proxy](https://github.com/sparfenyuk/mcp-proxy) stdio-to-HTTP bridge
+- **local**: CWD-aware, use as stdio per-session (not shared systemd service)
+- **stdio** (no HTTP): upstream doesn't support HTTP natively, use via `mkStdioEntry`
 
-```sh
-<package> --stdio [-- extra-args...]
-<package> --http [-- extra-args...]   # only where Transport includes http
-<package> --version
+## External Servers
+
+Remote MCP servers that run on external infrastructure — no local package or systemd service. Pre-baked config entries are available via `lib.externalServers`:
+
+```nix
+mcpServers = {
+  inherit (inputs.nix-mcp-servers.lib.externalServers) aws-mcp;
+  # => { type = "http"; url = "https://knowledge-mcp.global.api.aws"; }
+};
 ```
-
-Servers marked **(local)** operate on the local filesystem and should not be proxied to HTTP.
-
-## HTTP-only Servers
-
-Remote MCP servers that need no local packaging — configure directly in `mcp.json` with `"type": "http"`.
 
 | Server                                                                           | URL                                    |
 | -------------------------------------------------------------------------------- | -------------------------------------- |

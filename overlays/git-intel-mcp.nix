@@ -1,8 +1,8 @@
-_: final: _: let
+final: let
   nv = final.nv-sources.git-intel-mcp;
-  mkMcpWrapper = final.callPackage ./mk-mcp-wrapper.nix {};
-  unwrapped = final.buildNpmPackage {
-    pname = "git-intel-mcp-unwrapped";
+in
+  final.buildNpmPackage {
+    pname = "git-intel-mcp";
     inherit (nv) version src npmDepsHash;
     postPatch = "cp ${./locks/git-intel-mcp-package-lock.json} package-lock.json";
     nativeBuildInputs = [final.makeWrapper];
@@ -10,19 +10,9 @@ _: final: _: let
       runHook preInstall
       mkdir -p $out/lib/git-intel-mcp $out/bin
       cp -r dist node_modules package.json $out/lib/git-intel-mcp/
-      makeWrapper ${final.nodejs}/bin/node $out/bin/git-intel-mcp-unwrapped \
+      makeWrapper ${final.nodejs}/bin/node $out/bin/git-intel-mcp \
         --add-flags "$out/lib/git-intel-mcp/dist/index.js"
       runHook postInstall
     '';
-  };
-in {
-  git-intel-mcp = mkMcpWrapper {
-    name = "git-intel-mcp";
-    inherit (nv) version;
-    pkg = unwrapped;
-    modes = {
-      stdio = "git-intel-mcp-unwrapped";
-      http = "${final.mcp-proxy}/bin/mcp-proxy --port \"$MCP_PORT\" -- git-intel-mcp-unwrapped";
-    };
-  };
-}
+    meta.mainProgram = "git-intel-mcp";
+  }

@@ -8,18 +8,10 @@
 {
   context7-mcp = {
     pname = "context7-mcp";
-    version = "2.1.4";
+    version = "2.1.6";
     src = fetchurl {
-      url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-2.1.4.tgz";
-      sha256 = "sha256-G3ZrnUP0QUngr8vDZq/3UoSls4lX00+aQ0vUdeBGvA0=";
-    };
-  };
-  mcp-proxy = {
-    pname = "mcp-proxy";
-    version = "0.11.0";
-    src = fetchurl {
-      url = "https://pypi.org/packages/source/m/mcp_proxy/mcp_proxy-0.11.0.tar.gz";
-      sha256 = "sha256-NCTssfV/gXRiXd/w3xW1NKCHGdh89fnWorHgON5pafE=";
+      url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-2.1.6.tgz";
+      sha256 = "sha256-alZkQhVf/mifYwWafZPcOxnXLqbgiyYRw+JvWu767MM=";
     };
   };
   effect-mcp = {
@@ -44,6 +36,41 @@
     };
     date = "2026-03-18";
   };
+  github-mcp-server = {
+    pname = "github-mcp-server";
+    version = "v0.32.0";
+    src = fetchFromGitHub {
+      owner = "github";
+      repo = "github-mcp-server";
+      rev = "v0.32.0";
+      fetchSubmodules = false;
+      sha256 = "sha256-BD/t3UBAvrzJpRI7b06FjE8c+vzdQiXsj6eiUGQX6uA=";
+    };
+  };
+  kagiapi = {
+    pname = "kagiapi";
+    version = "0.2.1";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/k/kagiapi/kagiapi-0.2.1.tar.gz";
+      sha256 = "sha256-NV/kB7TGg9bwhIJ+T4VP2VE03yhC8V0Inaz/Yg4/Sus=";
+    };
+  };
+  kagimcp = {
+    pname = "kagimcp";
+    version = "0.1.4";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/k/kagimcp/kagimcp-0.1.4.tar.gz";
+      sha256 = "sha256-fCFmd6BKyyeggekFsJtno394ZeswTYSRELryHQQAcyY=";
+    };
+  };
+  mcp-proxy = {
+    pname = "mcp-proxy";
+    version = "0.11.0";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/m/mcp_proxy/mcp_proxy-0.11.0.tar.gz";
+      sha256 = "sha256-NCTssfV/gXRiXd/w3xW1NKCHGdh89fnWorHgON5pafE=";
+    };
+  };
   mcp-server-fetch = {
     pname = "mcp-server-fetch";
     version = "2025.4.7";
@@ -59,5 +86,33 @@
       url = "https://pypi.org/packages/source/m/mcp_server_git/mcp_server_git-2026.1.14.tar.gz";
       sha256 = "sha256-LNdHBMeycase174mYSDCCuiufMAeUtxsVJeQQCutK0Q=";
     };
+  };
+  openmemory-mcp = {
+    pname = "openmemory-mcp";
+    version = "1.3.3";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/openmemory-js/-/openmemory-js-1.3.3.tgz";
+      sha256 = "sha256-cxtfM3NvWjH4Q5V0TiqpFdgzzAeuiV6uX+Zv70dHy9I=";
+    };
+  };
+  sequential-thinking-mcp = {
+    pname = "sequential-thinking-mcp";
+    version = "2025.12.18";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/-/server-sequential-thinking-2025.12.18.tgz";
+      sha256 = "sha256-WiHm+kc3IrjmIqm7vdcrxtvN30MPJqtZic0z3+XcdwM=";
+    };
+  };
+  sympy-mcp = {
+    pname = "sympy-mcp";
+    version = "646c69558b622ab0e2814c58aa82143e56b76c33";
+    src = fetchFromGitHub {
+      owner = "sdiehl";
+      repo = "sympy-mcp";
+      rev = "646c69558b622ab0e2814c58aa82143e56b76c33";
+      fetchSubmodules = false;
+      sha256 = "sha256-AjRdiBtsF/ZpAUt+TPhvkT8VQ3y7rcJSogSSyQQXytI=";
+    };
+    date = "2026-03-18";
   };
 }

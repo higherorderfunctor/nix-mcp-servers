@@ -2,7 +2,10 @@
   inherit (lib) mkOption types optional;
 in {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "mcp-server-git";
+      http = "bridge";
+    };
     scope = "local";
     defaultPort = 19757;
     tools = ["git_add" "git_branch" "git_checkout" "git_commit" "git_create_branch" "git_diff" "git_diff_staged" "git_diff_unstaged" "git_log" "git_reset" "git_show" "git_status"];

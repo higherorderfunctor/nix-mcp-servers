@@ -6,12 +6,21 @@
   inherit (lib) mkOption types optionalAttrs;
 in {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "openmemory-mcp";
+      http = "bridge";
+    };
     scope = "remote";
     defaultPort = 19758;
     credentialVars = {
-      credentials = "OM_API_KEY";
-      openaiCredentials = "OPENAI_API_KEY";
+      credentials = {
+        envVar = "OM_API_KEY";
+        required = false;
+      };
+      openaiCredentials = {
+        envVar = "OPENAI_API_KEY";
+        required = false;
+      };
     };
     tools = ["openmemory_delete" "openmemory_get" "openmemory_list" "openmemory_query" "openmemory_reinforce" "openmemory_store"];
   };

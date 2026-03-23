@@ -1,6 +1,9 @@
 {lib, ...}: {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "effect-mcp";
+      http = "bridge";
+    };
     scope = "remote";
     defaultPort = 19754;
     tools = ["effect_docs_search" "get_effect_doc"];

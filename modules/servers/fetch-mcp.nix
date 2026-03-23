@@ -2,7 +2,10 @@
   inherit (lib) mkOption types optional;
 in {
   meta = {
-    modes = ["stdio" "http"];
+    modes = {
+      stdio = "mcp-server-fetch";
+      http = "bridge";
+    };
     scope = "remote";
     defaultPort = 19755;
     tools = ["fetch"];

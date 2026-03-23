@@ -3,6 +3,16 @@
 [mcp-proxy]
 src.pypi = "mcp-proxy"
 fetch.pypi = "mcp_proxy"
+[kagiapi]
+src.pypi = "kagiapi"
+fetch.pypi = "kagiapi"
+
+
+[kagimcp]
+src.pypi = "kagimcp"
+fetch.pypi = "kagimcp"
+
+
 [mcp-server-fetch]
 src.pypi = "mcp-server-fetch"
 fetch.pypi = "mcp_server_fetch"
@@ -24,6 +34,15 @@ src.cmd = "curl -s https://registry.npmjs.org/effect-mcp/latest | jq -r .version
 fetch.url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-$ver.tgz"
 
 
+[openmemory-mcp]
+src.cmd = "curl -s https://registry.npmjs.org/openmemory-js/latest | jq -r .version"
+fetch.url = "https://registry.npmjs.org/openmemory-js/-/openmemory-js-$ver.tgz"
+
+
+[sequential-thinking-mcp]
+src.cmd = "curl -s https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/latest | jq -r .version"
+fetch.url = "https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/-/server-sequential-thinking-$ver.tgz"
+
 
 # ── GitHub packages ──────────────────────────────────────────────
 
@@ -32,4 +51,16 @@ src.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
 src.use_commit = true
 src.branch = "master"
 fetch.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
+
+
+[github-mcp-server]
+src.github = "github/github-mcp-server"
+fetch.github = "github/github-mcp-server"
+
+
+[sympy-mcp]
+src.git = "https://github.com/sdiehl/sympy-mcp.git"
+src.use_commit = true
+src.branch = "main"
+fetch.github = "sdiehl/sympy-mcp"
 
