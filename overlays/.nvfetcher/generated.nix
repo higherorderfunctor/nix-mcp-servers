@@ -14,4 +14,20 @@
       sha256 = "sha256-G3ZrnUP0QUngr8vDZq/3UoSls4lX00+aQ0vUdeBGvA0=";
     };
   };
+  mcp-proxy = {
+    pname = "mcp-proxy";
+    version = "0.11.0";
+    src = fetchurl {
+      url = "https://pypi.org/packages/source/m/mcp_proxy/mcp_proxy-0.11.0.tar.gz";
+      sha256 = "sha256-NCTssfV/gXRiXd/w3xW1NKCHGdh89fnWorHgON5pafE=";
+    };
+  };
+  effect-mcp = {
+    pname = "effect-mcp";
+    version = "0.1.16";
+    src = fetchurl {
+      url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-0.1.16.tgz";
+      sha256 = "sha256-k36Ucri8CAw+xwVVKt58jwkjNlBF79KgHYr9v2lRvk8=";
+    };
+  };
 }

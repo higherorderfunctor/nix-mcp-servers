@@ -207,6 +207,8 @@ in
 
 | [context7-mcp](https://github.com/upstash/context7) | Context7 library documentation | stdio, http |
 
+| [effect-mcp](https://github.com/tim-smart/effect-mcp) | Effect documentation | stdio |
+
 All binaries use a unified interface:
 
 ```sh

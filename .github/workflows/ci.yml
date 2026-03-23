@@ -29,6 +29,8 @@ jobs:
       matrix:
         package:
           - context7-mcp
+          - effect-mcp
+          - mcp-proxy
           - nixos-mcp
     steps:
       - uses: actions/checkout@v6

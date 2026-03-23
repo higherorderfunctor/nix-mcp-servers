@@ -34,6 +34,7 @@
       mcpLib = import ../lib {inherit lib;};
     }) {
     context7-mcp = ./servers/context7-mcp.nix;
+    effect-mcp = ./servers/effect-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
   };
 
