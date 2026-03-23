@@ -33,6 +33,7 @@
       inherit lib;
       mcpLib = import ../lib {inherit lib;};
     }) {
+    aws-mcp = ./servers/aws-mcp.nix;
     context7-mcp = ./servers/context7-mcp.nix;
     effect-mcp = ./servers/effect-mcp.nix;
     fetch-mcp = ./servers/fetch-mcp.nix;
