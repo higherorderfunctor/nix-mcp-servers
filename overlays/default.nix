@@ -4,6 +4,7 @@
   overlays = [
     ./sources.nix
     ./context7-mcp.nix
+    ./effect-mcp.nix
     ./nixos-mcp.nix
   ];
 in

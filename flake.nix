@@ -29,6 +29,7 @@
     in {
       default = import ./overlays {inherit inputs;};
       context7-mcp = perPkg "context7-mcp";
+      effect-mcp = perPkg "effect-mcp";
       nixos-mcp = perPkg "nixos-mcp";
     };
 
@@ -189,6 +190,7 @@
       inherit
         (pkgs)
         context7-mcp
+        effect-mcp
         nixos-mcp
         ;
     });
