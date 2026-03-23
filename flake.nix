@@ -30,6 +30,7 @@
       default = import ./overlays {inherit inputs;};
       context7-mcp = perPkg "context7-mcp";
       effect-mcp = perPkg "effect-mcp";
+      fetch-mcp = perPkg "fetch-mcp";
       nixos-mcp = perPkg "nixos-mcp";
     };
 
@@ -160,7 +161,9 @@
             {
               services.mcp-servers = {
                 enable = true;
-                servers = {};
+                servers = {
+                  fetch-mcp.enable = true;
+                };
               };
             }
           ];
@@ -191,6 +194,7 @@
         (pkgs)
         context7-mcp
         effect-mcp
+        fetch-mcp
         nixos-mcp
         ;
     });

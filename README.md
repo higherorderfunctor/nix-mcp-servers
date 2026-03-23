@@ -175,6 +175,8 @@ in
 
 | [effect-mcp](https://github.com/tim-smart/effect-mcp) | Effect documentation | stdio |
 
+| [fetch-mcp](https://github.com/modelcontextprotocol/servers) | HTTP fetch and content extraction | stdio |
+
 All binaries use a unified interface:
 
 ```sh

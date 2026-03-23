@@ -1,3 +1,10 @@
+# ── PyPI packages ────────────────────────────────────────────────
+
+[mcp-server-fetch]
+src.pypi = "mcp-server-fetch"
+fetch.pypi = "mcp_server_fetch"
+
+
 # ── npm packages ──────────────────────────────────────────────────
 
 [context7-mcp]

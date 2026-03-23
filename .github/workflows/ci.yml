@@ -30,6 +30,7 @@ jobs:
         package:
           - context7-mcp
           - effect-mcp
+          - fetch-mcp
           - nixos-mcp
     steps:
       - uses: actions/checkout@v6
