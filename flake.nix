@@ -18,6 +18,20 @@
   in {
     overlays.default = import ./overlays {inherit inputs;};
 
+    homeManagerModules.default = import ./modules/home-manager.nix;
+
+    lib = {
+      # Generate an mcp.json-compatible attrset from a flat server map.
+      mkMcpConfig = servers: {mcpServers = servers;};
+
+      # Map a function over every (server, tool) pair in a tools attrset.
+      # Type: (String -> String -> a) -> AttrSet -> [a]
+      mapTools = f: tools:
+        nixpkgs.lib.concatLists (nixpkgs.lib.mapAttrsToList
+          (server: toolList: map (tool: f server tool) toolList)
+          tools);
+    };
+
     devShells = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in {
@@ -87,6 +101,41 @@
           nativeBuildInputs = [pkgs.shellharden];
         } ''
           shellharden --check ${self}/apps/*.sh
+          touch $out
+        '';
+
+      home-manager-module = let
+        eval = nixpkgs.lib.evalModules {
+          modules = [
+            self.homeManagerModules.default
+            {
+              options = {
+                assertions = nixpkgs.lib.mkOption {
+                  type = nixpkgs.lib.types.listOf nixpkgs.lib.types.unspecified;
+                  default = [];
+                };
+                systemd.user.services = nixpkgs.lib.mkOption {
+                  type = nixpkgs.lib.types.attrsOf nixpkgs.lib.types.unspecified;
+                  default = {};
+                };
+              };
+              config._module.args.pkgs = import nixpkgs {
+                inherit system;
+                overlays = [self.overlays.default];
+              };
+            }
+            {
+              services.mcp-servers = {
+                enable = true;
+                servers = {};
+              };
+            }
+          ];
+        };
+      in
+        pkgs.runCommand "check-home-manager-module" {} ''
+          # Verify mcpConfig evaluates and has expected structure
+          test '${builtins.toJSON eval.config.services.mcp-servers.mcpConfig}' != '{}'
           touch $out
         '';
     });
