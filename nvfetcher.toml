@@ -16,3 +16,12 @@ fetch.url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-$ve
 src.cmd = "curl -s https://registry.npmjs.org/effect-mcp/latest | jq -r .version"
 fetch.url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-$ver.tgz"
 
+
+# ── GitHub packages ──────────────────────────────────────────────
+
+[git-intel-mcp]
+src.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
+src.use_commit = true
+src.branch = "master"
+fetch.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
+

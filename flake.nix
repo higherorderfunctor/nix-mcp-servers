@@ -31,6 +31,7 @@
       context7-mcp = perPkg "context7-mcp";
       effect-mcp = perPkg "effect-mcp";
       fetch-mcp = perPkg "fetch-mcp";
+      git-intel-mcp = perPkg "git-intel-mcp";
       nixos-mcp = perPkg "nixos-mcp";
     };
 
@@ -195,6 +196,7 @@
         context7-mcp
         effect-mcp
         fetch-mcp
+        git-intel-mcp
         nixos-mcp
         ;
     });
