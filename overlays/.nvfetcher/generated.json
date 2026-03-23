@@ -70,6 +70,36 @@
         },
         "version": "v0.32.0"
     },
+    "kagiapi": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "kagiapi",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-NV/kB7TGg9bwhIJ+T4VP2VE03yhC8V0Inaz/Yg4/Sus=",
+            "type": "url",
+            "url": "https://pypi.org/packages/source/k/kagiapi/kagiapi-0.2.1.tar.gz"
+        },
+        "version": "0.2.1"
+    },
+    "kagimcp": {
+        "cargoLock": null,
+        "date": null,
+        "extract": null,
+        "name": "kagimcp",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-fCFmd6BKyyeggekFsJtno394ZeswTYSRELryHQQAcyY=",
+            "type": "url",
+            "url": "https://pypi.org/packages/source/k/kagimcp/kagimcp-0.1.4.tar.gz"
+        },
+        "version": "0.1.4"
+    },
     "mcp-server-fetch": {
         "cargoLock": null,
         "date": null,

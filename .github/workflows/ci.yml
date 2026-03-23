@@ -34,6 +34,7 @@ jobs:
           - git-intel-mcp
           - git-mcp
           - github-mcp
+          - kagi-mcp
           - nixos-mcp
     steps:
       - uses: actions/checkout@v6

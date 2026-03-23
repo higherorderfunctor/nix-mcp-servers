@@ -1,5 +1,15 @@
 # ── PyPI packages ────────────────────────────────────────────────
 
+[kagiapi]
+src.pypi = "kagiapi"
+fetch.pypi = "kagiapi"
+
+
+[kagimcp]
+src.pypi = "kagimcp"
+fetch.pypi = "kagimcp"
+
+
 [mcp-server-fetch]
 src.pypi = "mcp-server-fetch"
 fetch.pypi = "mcp_server_fetch"

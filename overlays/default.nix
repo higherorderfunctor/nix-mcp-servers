@@ -9,6 +9,7 @@
     ./github-mcp.nix
     ./git-intel-mcp.nix
     ./git-mcp.nix
+    ./kagi-mcp.nix
     ./nixos-mcp.nix
   ];
 in

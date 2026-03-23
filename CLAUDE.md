@@ -92,7 +92,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
 | npm            | context7-mcp, git-intel-mcp                                          | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
 | Script         | effect-mcp                                                           | `stdenv.mkDerivation` or `writeShellApplication`                |
-| Python         | fetch-mcp, git-mcp                                                   | `python313Packages.buildPythonApplication` with pyproject       |
+| Python         | fetch-mcp, git-mcp, kagi-mcp                                         | `python313Packages.buildPythonApplication` with pyproject       |
 | Go             | github-mcp                                                           | `buildGoModule` with vendorHash                                 |
 
 ### Server Reference
@@ -113,6 +113,8 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | git-mcp | [PyPI](https://pypi.org/project/mcp-server-git/) | PyPI latest | `buildPythonApplication` (3.13) | stdio | local | runtime |
 
 | github-mcp | [GitHub](https://github.com/github/github-mcp-server) | tagged releases | `buildGoModule` | stdio, http | remote | [README](https://github.com/github/github-mcp-server) |
+
+| kagi-mcp | [PyPI](https://pypi.org/project/kagimcp/) | PyPI latest | `buildPythonApplication` (3.14) | stdio, http | remote | [source](https://github.com/kagisearch/kagi-mcp) |
 
 ### Updating Tool Lists
 
