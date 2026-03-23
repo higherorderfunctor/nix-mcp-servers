@@ -20,3 +20,20 @@ jobs:
           name: hof-nix-mcp-servers
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - run: nix flake check
+
+  build:
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - nixos-mcp
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: cachix/cachix-action@v17
+        with:
+          name: hof-nix-mcp-servers
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - run: nix build .#${{ matrix.package }}
