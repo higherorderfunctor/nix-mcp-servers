@@ -6,6 +6,7 @@
 }: let
   inherit
     (lib)
+    concatMapStringsSep
     concatStringsSep
     escapeShellArg
     filterAttrs
@@ -27,6 +28,7 @@
 
   # ── Import per-server definitions ──────────────────────────────────
   serverFiles = mapAttrs (_: path: import path {inherit lib;}) {
+    context7-mcp = ./servers/context7-mcp.nix;
     nixos-mcp = ./servers/nixos-mcp.nix;
   };
 
@@ -66,10 +68,21 @@
         description = "Server-specific configuration for ${name}.";
       };
 
+      environmentFiles = mkOption {
+        type = types.listOf types.str;
+        default = [];
+        description = ''
+          Paths to files containing environment variables in KEY=VALUE format,
+          read at runtime. Use for secrets (API keys, tokens) that should not
+          be stored in the Nix store. Works with sops-nix, agenix, or any tool
+          that produces environment files.
+        '';
+      };
+
       env = mkOption {
         type = types.attrsOf types.str;
         default = {};
-        description = "Extra environment variables (escape hatch for options not yet in settings). Values end up in the Nix store.";
+        description = "Extra environment variables (escape hatch for options not yet in settings). Values end up in the Nix store — use environmentFiles for secrets.";
       };
 
       args = mkOption {
@@ -107,16 +120,29 @@
   in
     (serverDef.settingsToArgs srv) ++ srv.args;
 
+  # ── Secrets wrapper for stdio servers with environmentFiles ────────
+  mkSecretsWrapper = name: srv:
+    pkgs.writeShellScript "${name}-env" ''
+      set -euETo pipefail
+      shopt -s inherit_errexit 2>/dev/null || :
+      ${concatMapStringsSep "\n" (f: ''set -a; . "${f}"; set +a'') srv.environmentFiles}
+      exec "${getExe srv.package}" "$@"
+    '';
+
   # ── mcp.json entry builder ────────────────────────────────────────
   mkMcpEntry = name: srv: let
     srvEnv = effectiveEnv name srv;
     srvArgs = effectiveArgs name srv;
+    hasEnvFiles = srv.environmentFiles != [];
   in
     if srv.transport == "stdio"
     then
       {
         type = "stdio";
-        command = getExe srv.package;
+        command =
+          if hasEnvFiles
+          then "${mkSecretsWrapper name srv}"
+          else getExe srv.package;
         args = ["--stdio"] ++ optionals (srvArgs != []) (["--"] ++ srvArgs);
       }
       // optionalAttrs (srvEnv != {}) {env = srvEnv;}
@@ -206,6 +232,7 @@ in {
             Restart = "on-failure";
             RestartSec = 5;
             Environment = mapAttrsToList (k: v: "${k}=${escapeShellArg v}") srvEnv;
+            EnvironmentFile = srv.environmentFiles;
           };
           Install = {
             WantedBy = ["default.target"];

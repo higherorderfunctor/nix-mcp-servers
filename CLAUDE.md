@@ -90,6 +90,7 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | Pattern        | Used for                                                             | Builder                                                         |
 | -------------- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
 | External flake | nixos-mcp                                                            | Consumed from `mcp-nixos` flake input                           |
+| npm            | context7-mcp                                                         | `buildNpmPackage` with tracked lock file from `overlays/locks/` |
 
 ### Server Reference
 
@@ -97,6 +98,8 @@ Every package follows a two-layer pattern: build an `unwrapped` derivation, then
 | Package   | Upstream                                       | Track      | Builder              | Transport   | Scope  | Tool Discovery |
 | --------- | ---------------------------------------------- | ---------- | -------------------- | ----------- | ------ | -------------- |
 | nixos-mcp | [flake](https://github.com/utensils/mcp-nixos) | flake main | external flake input | stdio, http | remote | runtime        |
+
+| context7-mcp | [npm](https://www.npmjs.com/package/@upstash/context7-mcp) | npm latest | `buildNpmPackage` | stdio, http | remote | runtime |
 
 ### Updating Tool Lists
 
@@ -179,7 +182,9 @@ All code must pass the project linters before committing. Run from the devShell:
 
 ## Home Manager Module
 
-Servers are configured under `services.mcp-servers.servers.<name>` with options: `enable`, `package`, `transport` (stdio/http), `port`, `host`, `settings`, `env`, `args`. Servers marked `local` in the module are stdio-only. Remote/HTTP servers get systemd user services.
+Servers are configured under `services.mcp-servers.servers.<name>` with options: `enable`, `package`, `transport` (stdio/http), `port`, `host`, `settings`, `env`, `args`, `environmentFiles`. Servers marked `local` in the module are stdio-only. Remote/HTTP servers get systemd user services.
+
+Secrets must use `environmentFiles` (list of paths to `KEY=VALUE` files read at runtime), not `settings` or `env` which end up in the Nix store. For stdio servers, `environmentFiles` generates a wrapper script that sources the files before exec. For HTTP servers, the files are passed to systemd `EnvironmentFile`.
 
 ### `settingsToEnv` / `settingsToArgs` Contract
 

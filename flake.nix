@@ -28,6 +28,7 @@
         lib.composeManyExtensions [sources (import' ./overlays/${name}.nix)];
     in {
       default = import ./overlays {inherit inputs;};
+      context7-mcp = perPkg "context7-mcp";
       nixos-mcp = perPkg "nixos-mcp";
     };
 
@@ -187,6 +188,7 @@
     in {
       inherit
         (pkgs)
+        context7-mcp
         nixos-mcp
         ;
     });
