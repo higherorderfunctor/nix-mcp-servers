@@ -28,7 +28,11 @@
   cfg = config.services.mcp-servers;
 
   # ── Import per-server definitions ──────────────────────────────────
-  serverFiles = mapAttrs (_: path: import path {inherit lib;}) {
+  serverFiles = mapAttrs (_: path:
+    import path {
+      inherit lib;
+      mcpLib = import ../lib {inherit lib;};
+    }) {
     nixos-mcp = ./servers/nixos-mcp.nix;
   };
 
@@ -44,21 +48,10 @@
           description = "Server-specific configuration for ${name}.";
         };
 
-        environmentFiles = mkOption {
-          type = types.listOf types.str;
-          default = [];
-          description = ''
-            Paths to files containing environment variables in KEY=VALUE format,
-            read at runtime. Use for secrets (API keys, tokens) that should not
-            be stored in the Nix store. Works with sops-nix, agenix, or any tool
-            that produces environment files.
-          '';
-        };
-
         env = mkOption {
           type = types.attrsOf types.str;
           default = {};
-          description = "Extra environment variables (escape hatch for options not yet in settings). Values end up in the Nix store — use environmentFiles for secrets.";
+          description = "Extra environment variables (escape hatch for options not yet in settings). Values end up in the Nix store — use credentials for secrets.";
         };
 
         args = mkOption {
@@ -85,7 +78,7 @@
 
         service = {
           port = mkOption {
-            type = types.nullOr types.port;
+            type = types.port;
             default = serverDef.meta.defaultPort;
             description = "Port to bind for the HTTP service.";
           };
@@ -99,6 +92,9 @@
       };
   };
 
+  # ── Credentials helpers ──────────────────────────────────────────────
+  credentialVarsFor = name: serverFiles.${name}.meta.credentialVars or {};
+
   # ── Derived sets ───────────────────────────────────────────────────
   enabledServers = filterAttrs (_: srv: srv.enable) cfg.servers;
 
@@ -108,14 +104,26 @@
     enabledServers;
 
   # ── Delegate entry building to lib ─────────────────────────────────
-  mkHttpEntry = name: srv:
-    mcpLib.mkHttpEntry ({
+  mkHttpEntry = name: srv: let
+    serverDef = serverFiles.${name};
+    baseEntry = mcpLib.mkHttpEntry ({
         inherit name;
         settings = srv.settings;
       }
-      // optionalAttrs (!(isExternal serverFiles.${name})) {
+      // optionalAttrs (!(isExternal serverDef)) {
         inherit (srv.service) port host;
       });
+    credVars = credentialVarsFor name;
+    evaluatedSettings = mcpLib.evalSettings name srv.settings;
+    hasCreds = mcpLib.hasCredentials credVars evaluatedSettings;
+    usesHeaderAuth = (serverDef.meta.httpAuth or null) == "header";
+    # Generate a headersHelper script for servers with client-side header auth
+    headersHelper = mcpLib.mkHeadersHelper pkgs name credVars evaluatedSettings;
+  in
+    baseEntry
+    // optionalAttrs (usesHeaderAuth && hasCreds) {
+      inherit headersHelper;
+    };
 
   # ── Effective env/args for systemd services ────────────────────────
   effectiveEnv = name: srv: mode: let
@@ -177,18 +185,33 @@ in {
     services.mcp-servers.tools =
       mapAttrs (name: _: serverFiles.${name}.meta.tools or []) enabledServers;
 
-    assertions =
-      mapAttrsToList (name: srv: let
-        serverDef = serverFiles.${name};
-      in {
-        assertion = isExternal serverDef || srv.service.port != null;
-        message = "services.mcp-servers.servers.${name}: service.port is required for packaged servers";
-      })
-      enabledServers;
+    assertions = [];
 
     systemd.user.services = mapAttrs' (name: srv: let
       srvEnv = effectiveEnv name srv "http";
       srvArgs = effectiveArgs name srv "http";
+      credVars = credentialVarsFor name;
+      evaluatedSettings = mcpLib.evalSettings name srv.settings;
+      serverDef = serverFiles.${name};
+      usesHeaderAuth = (serverDef.meta.httpAuth or null) == "header";
+      # Only inject credentials into the service env for servers without client-side header auth
+      hasCreds = !usesHeaderAuth && mcpLib.hasCredentials credVars evaluatedSettings;
+      baseCmd = concatStringsSep " " (
+        map escapeShellArg (
+          [(getExe srv.package) "--http"]
+          ++ optionals (srvArgs != []) (["--"] ++ srvArgs)
+        )
+      );
+      execStart =
+        if hasCreds
+        then
+          toString (pkgs.writeShellScript ("mcp-" + name + "-start") ''
+            set -euETo pipefail
+            shopt -s inherit_errexit 2>/dev/null || :
+            ${mcpLib.mkCredentialsSnippet credVars evaluatedSettings}
+            exec ${baseCmd}
+          '')
+        else baseCmd;
     in
       nameValuePair ("mcp-" + name) {
         Unit = {
@@ -197,18 +220,12 @@ in {
         };
         Service = {
           Type = "simple";
-          ExecStart = concatStringsSep " " (
-            map escapeShellArg (
-              [(getExe srv.package) "--http"]
-              ++ optionals (srvArgs != []) (["--"] ++ srvArgs)
-            )
-          );
+          ExecStart = execStart;
           Restart = "on-failure";
           RestartSec = 5;
           Environment =
             [("MCP_PORT=" + toString srv.service.port)]
             ++ mapAttrsToList (k: v: k + "=" + escapeShellArg v) srvEnv;
-          EnvironmentFile = srv.environmentFiles;
         };
         Install = {
           WantedBy = ["default.target"];
