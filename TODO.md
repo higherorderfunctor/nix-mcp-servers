@@ -56,6 +56,13 @@
   - Kiro CLI: `headers` with `${env:VAR_NAME}` interpolation — needs env wrapping or auth proxy
   - Auth proxy option: Caddy reverse proxy reads sops, injects header. Any client connects without auth.
   - Decision deferred until multi-session bridge or native HTTP is needed
+- [ ] Add cclsp (LSP-MCP bridge) with eslint adapter. See memory `project_cclsp_eslint_adapter.md` for full research context, patch details, and candidate evaluation:
+  1. Test eslint adapter patch against charter-developer-platform (real eslint config in `.kiro/settings/lsp.json`)
+  2. Package cclsp in nix-mcp-servers (`buildNpmPackage` + `0001-feat-add-eslint-adapter-for-workspace-configuration.patch`)
+  3. Add `modules/servers/cclsp.nix` + HM integration (local scope, stdio transport)
+  4. Upstream eslint adapter PR to `ktnyt/cclsp` — no existing PRs or forks cover this (checked 2026-03-30)
+  - Patch files in `overlays/patches/cclsp/` — adapter handles `workspace/configuration`, `eslint/confirmESLintExecution`, custom notifications
+  - Motivation: Kiro CLI lacks `workspace/configuration` support (kirodotdev/Kiro#6174, #6040), cclsp MCP bypass is the only working path
 - [ ] Add new servers (one commit each, stacked):
   - filesystem-mcp — `@modelcontextprotocol/server-filesystem` (npm, `buildNpmPackage`)
   - atlassian-mcp — `mcp-atlassian` (PyPI, `buildPythonApplication`, Jira + Confluence Data Center via PAT)

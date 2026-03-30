@@ -1,0 +1,44 @@
+{
+  "servers": [
+    {
+      "extensions": ["ts", "tsx", "js", "jsx", "mts", "cts", "mjs", "cjs", "vue"],
+      "command": ["vscode-eslint-language-server", "--stdio"],
+      "rootDir": ".",
+      "initializationOptions": {
+        "settings": {
+          "nodePath": "node_modules",
+          "useFlatConfig": true,
+          "run": "onType",
+          "quiet": true,
+          "probe": [
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact",
+            "vue"
+          ],
+          "validate": "probe",
+          "format": false,
+          "onIgnoredFiles": "off",
+          "problems": {
+            "shortenToSingleLine": true
+          },
+          "codeAction": {
+            "disableRuleComment": {
+              "enable": true,
+              "location": "separateLine",
+              "commentStyle": "line"
+            },
+            "showDocumentation": {
+              "enable": true
+            }
+          },
+          "codeActionOnSave": {
+            "mode": "all"
+          },
+          "workingDirectories": [{ "mode": "auto" }]
+        }
+      }
+    }
+  ]
+}
