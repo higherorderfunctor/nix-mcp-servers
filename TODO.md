@@ -2,17 +2,12 @@
 
 ## Dev work
 
-- [ ] Bug: Claude Code doesn't handle `tools/list_changed` notifications — dynamic toolsets don't work. Defaulted `dynamicToolsets` to `false` as workaround. File upstream bug if not already known.
+- [x] Bug: Claude Code doesn't handle `tools/list_changed` notifications — tracked upstream as anthropics/claude-code#41123 (open, 2026-03-30). Workaround: `dynamicToolsets` defaults to `false`. See memory `project_tools_list_changed_bug.md`.
 - [ ] Investigate mcp-proxy single-session limitation — mcp-proxy bridges a single stdio process, so only one MCP client session at a time. Affects all bridge servers (effect-mcp, fetch-mcp, git-intel-mcp, openmemory-mcp, sequential-thinking-mcp, sympy-mcp). For now these are HTTP systemd services (shared), which works if only one client connects. Multi-session needs native HTTP or auth proxy.
 - [ ] github-mcp transport decision: currently stdio (per-session) because mcp-proxy bridge is single-session and native HTTP requires client-side auth headers. Consider switching to native HTTP if auth proxy or per-client header support is implemented.
-- [ ] Refactor credentials to use `types.attrTag` instead of assertions:
-  - Current: `credentials = { file = nullOr str; helper = nullOr str; }` with assertion for mutual exclusion
-  - Better: `credentials = types.attrTag { file = types.str; helper = types.str; }` — type-enforced exactly-one
-  - Usage becomes `settings.credentials.file = "/path";` OR `settings.credentials.helper = "/path";` (same API)
-  - Removes need for the mutual exclusion assertion entirely
-  - Review other places where assertions enforce "pick one" that could use `attrTag` instead
-- [ ] Audit nvfetcher sources for provenance — prefer official GitHub repos over PyPI/npm when the publisher is unclear. Specifically: `kagimcp` and `kagiapi` are fetched from PyPI but the official source is `github.com/kagisearch/kagimcp`. Consider switching to GitHub releases or tags for better provenance. Review all sources for similar concerns.
-- [ ] Add `check-health` integration test script — starts each server and verifies it responds on its configured port. See memory `project_health_check.md` for design notes and bug history that motivated this.
+- [ ] Refactor credentials to use `types.attrTag` instead of assertions. Full migration plan with code diffs and verification checklist in memory `project_credentials_attrtag.md`. **Needs HITL** — changes lib/default.nix and modules/home-manager.nix, API-compatible but error messages change.
+- [x] Audit nvfetcher sources for provenance — **complete**. All publishers verified, provenance comments added to nvfetcher.toml. No source type changes needed (PyPI is the official channel for all current packages). See memory `project_nvfetcher_audit.md`.
+- [x] Add `check-health` integration test script — `apps/check-health.sh` written, registered in `apps/default.nix`. Probes stdio servers with MCP initialize request, skips servers requiring credentials. Run via `nix run .#check-health`.
 - [ ] openmemory-mcp full redesign before installing. See memory `project_openmemory_design.md` and `project_openmemory_research.md`:
   - **Research complete.** 60+ env vars documented, all backends mapped, embedding providers compared.
   - Use `types.attrTag` for backend config (sqlite vs postgres discriminated union, available since nixpkgs 24.05)
@@ -23,7 +18,6 @@
 
 ## Publish
 
-- [ ] Configure GitHub repo secrets: `MCP_GITHUB_TOKEN`, `MCP_KAGI_API_KEY`, `MCP_OPENMEMORY_API_KEY`
 - [ ] Create `automated` and `drift` issue labels
 - [ ] README: add CI status badge
 - [ ] Verify Copilot Coding Agent picks up drift issues (set Claude as model in Copilot settings)

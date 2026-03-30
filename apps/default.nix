@@ -10,6 +10,13 @@
     program = "${app}/bin/${name}";
   };
 in {
+  check-health = mkApp "check-health" (with pkgs; [
+    coreutils
+    gnugrep
+    nix
+    python3
+  ]);
+
   check-drift = mkApp "check-drift" (with pkgs; [
     coreutils
     gnugrep

@@ -1,66 +1,69 @@
 # ── PyPI packages ────────────────────────────────────────────────
 
+# Upstream: https://github.com/modelcontextprotocol/python-sdk (mcp-proxy CLI)
 [mcp-proxy]
 src.pypi = "mcp-proxy"
 fetch.pypi = "mcp_proxy"
+
+# Upstream: https://github.com/kagisearch/kagimcp (dependency of kagi-mcp)
 [kagiapi]
 src.pypi = "kagiapi"
 fetch.pypi = "kagiapi"
 
-
+# Upstream: https://github.com/kagisearch/kagimcp
 [kagimcp]
 src.pypi = "kagimcp"
 fetch.pypi = "kagimcp"
 
-
+# Upstream: https://github.com/modelcontextprotocol/servers (src/fetch)
 [mcp-server-fetch]
 src.pypi = "mcp-server-fetch"
 fetch.pypi = "mcp_server_fetch"
 
-
+# Upstream: https://github.com/modelcontextprotocol/servers (src/git)
 [mcp-server-git]
 src.pypi = "mcp-server-git"
 fetch.pypi = "mcp_server_git"
 
-
 # ── npm packages ──────────────────────────────────────────────────
 
+# Upstream: https://github.com/upstash/context7
 [context7-mcp]
 src.cmd = "curl -s https://registry.npmjs.org/@upstash/context7-mcp/latest | jq -r .version"
 fetch.url = "https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-$ver.tgz"
 
+# Upstream: https://github.com/tim-smart/effect-mcp
 [effect-mcp]
 src.cmd = "curl -s https://registry.npmjs.org/effect-mcp/latest | jq -r .version"
 fetch.url = "https://registry.npmjs.org/effect-mcp/-/effect-mcp-$ver.tgz"
 
-
+# Upstream: https://github.com/openmemory/openmemory
 [openmemory-mcp]
 src.cmd = "curl -s https://registry.npmjs.org/openmemory-js/latest | jq -r .version"
 fetch.url = "https://registry.npmjs.org/openmemory-js/-/openmemory-js-$ver.tgz"
 
-
+# Upstream: https://github.com/modelcontextprotocol/servers (src/sequentialthinking)
 [sequential-thinking-mcp]
 src.cmd = "curl -s https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/latest | jq -r .version"
 fetch.url = "https://registry.npmjs.org/@modelcontextprotocol/server-sequential-thinking/-/server-sequential-thinking-$ver.tgz"
 
-
 # ── GitHub packages ──────────────────────────────────────────────
 
+# Upstream: https://github.com/hoangsonww/GitIntel-MCP-Server (no releases, track master)
 [git-intel-mcp]
 src.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
 src.use_commit = true
 src.branch = "master"
 fetch.git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git"
 
-
+# Upstream: https://github.com/github/github-mcp-server (tagged releases)
 [github-mcp-server]
 src.github = "github/github-mcp-server"
 fetch.github = "github/github-mcp-server"
 
-
+# Upstream: https://github.com/sdiehl/sympy-mcp (no releases, track main)
 [sympy-mcp]
 src.git = "https://github.com/sdiehl/sympy-mcp.git"
 src.use_commit = true
 src.branch = "main"
 fetch.github = "sdiehl/sympy-mcp"
-
