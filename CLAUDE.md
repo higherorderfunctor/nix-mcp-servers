@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-nix-mcp-servers is a Nix flake that packages Model Context Protocol (MCP) servers as Nix derivations. It provides a namespaced overlay (`pkgs.nix-mcp-servers.*`), optional normalized wrappers (`pkgs.nix-mcp-servers.normalized.*`), and a Home Manager module for declarative configuration.
+nix-mcp-servers is a Nix flake that packages Model Context Protocol (MCP) servers as Nix derivations. It provides a namespaced overlay (`pkgs.nix-mcp-servers.*`) and a Home Manager module for declarative configuration.
 
 ## Build & Validation Commands
 
@@ -33,10 +33,9 @@ All packages from the overlay are available in the devShell (`nix develop`). Use
 
 - **flake.nix** — Defines inputs, composes the overlay, exports packages, devShell, `lib`, and `homeManagerModules.default`.
 - **lib/default.nix** — Core library: settings validation (`evalSettings`), entry builders (`mkStdioEntry`, `mkHttpEntry`, `mkStdioConfig`). Loads server definitions on demand via `loadServer` — no centralized server list. Works standalone without Home Manager.
-- **overlays/default.nix** — Single overlay adding `pkgs.nix-mcp-servers` namespace (raw packages + `normalized` sub-attrset).
+- **overlays/default.nix** — Single overlay adding `pkgs.nix-mcp-servers` namespace.
 - **overlays/sources.nix** — Overlay that exposes `final.nv-sources.<name>` from nvfetcher's `generated.nix` merged with `hashes.json`.
 - **modules/home-manager.nix** — Home Manager service layer: options, systemd services, assertions. Delegates entry building and settings validation to `lib/`.
-- **overlays/mk-mcp-wrapper.nix** — Shared wrapper that gives every server a uniform `--stdio` / `--http` CLI.
 
 ## Commit Convention
 
@@ -59,7 +58,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/). 
 - `feat(kagi-mcp): add kagi MCP server package`
 - `fix(update): correct npmDepsHash prefetch step`
 - `chore: update flake inputs and nvfetcher sources`
-- `refactor(wrapper): simplify mkMcpWrapper dispatch logic`
+- `refactor(lib): credentials use types.attrTag`
 - `docs: update CLAUDE.md with conventional commits guide`
 
 ### Version Tracking
@@ -86,10 +85,6 @@ Consumers pin versions via their own `flake.lock`. Per-package version overrides
 ### Update App (`nix run .#update`)
 
 Defined in `apps/update.nix` wrapping `apps/update.sh` via `writeShellApplication` with all runtime dependencies. Runs 6 steps: (1) `nix flake update`, (2) `nvfetcher` to refresh versions, (3) regenerate npm lock files, (4) update `npmDepsHash` values via `prefetch-npm-deps`, (5) update Go `vendorHash`, (6) verify with `nix flake show`.
-
-### mkMcpWrapper
-
-`overlays/mk-mcp-wrapper.nix` exports a function `{ name, pkg, modes }` where `modes = { stdio = "cmd" or null; http = "cmd" or null; }` (at least one must be non-null). It produces a `writeShellApplication` that dispatches `--stdio`/`--http` flags to the underlying binary. All exported packages go through this wrapper.
 
 ### Package Build Patterns
 
@@ -148,9 +143,9 @@ printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion
 1. Determine upstream version strategy per the Upstream Version Strategy table (flake input, GitHub main/releases, PyPI/npm latest)
 2. Add source entry to `nvfetcher.toml` (key must match the exported package name) — or for flake-based servers, add to `flake.nix` inputs
 3. Run `nvfetcher` to regenerate `overlays/.nvfetcher/generated.nix` and `generated.json`
-4. Create `overlays/<name>.nix` — access sources via `final.nv-sources.<key>`, build unwrapped, wrap with `mkMcpWrapper` (pass `version`, specify `stdio` and optionally `http` modes)
+4. Create `overlays/<name>.nix` — access sources via `final.nv-sources.<key>`, build the raw package
 5. Add overlay to the list in `overlays/default.nix` (alphabetical)
-6. Add package to `overlays/default.nix` raw + normalized sections (alphabetical)
+6. Add package to `overlays/default.nix` `nix-mcp-servers` attrset (alphabetical)
 7. Add package to `packages` inherit list in `flake.nix` (alphabetical)
 8. Create `modules/servers/<name>.nix` with `meta` (`modes`, `scope`, `defaultPort`, `tools`), `settingsOptions`, `settingsToEnv`, `settingsToArgs`
 9. Register the server module in `modules/home-manager.nix` (`serverFiles` attrset, alphabetical)
@@ -175,7 +170,7 @@ Never duplicate logic, configuration, or patterns. When the same thing appears t
 
 Current tech stack examples (update when new stacks are added):
 
-- **Nix:** repeated attribute patterns → shared function or `let` binding. Common overlay/module patterns → parameterized helper (e.g., `mkMcpWrapper`).
+- **Nix:** repeated attribute patterns → shared function or `let` binding. Common overlay/module patterns → parameterized helper.
 - **Bash:** repeated command sequences → function within the script, or a shared library script for cross-script reuse.
 - **Config/flags:** linter invocations, tool flags, etc. must be defined in one place and consumed by all callers. When adding or changing, update the single source of truth — not each consumer independently.
 

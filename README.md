@@ -20,8 +20,7 @@ Apply the overlay — packages are namespaced under `pkgs.nix-mcp-servers`:
 ```nix
 overlays = [ inputs.nix-mcp-servers.overlays.default ];
 
-# Raw packages: pkgs.nix-mcp-servers.github-mcp
-# Normalized (--stdio/--http/--version wrapper): pkgs.nix-mcp-servers.normalized.github-mcp
+# Packages: pkgs.nix-mcp-servers.github-mcp
 ```
 
 ### Binary cache
