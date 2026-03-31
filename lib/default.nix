@@ -56,36 +56,31 @@
     (serverDef.settingsToArgs cfgShim mode) ++ extraArgs;
 
   # ── Credentials option generator ──────────────────────────────────
-  # Creates a flat { file; helper; } submodule option for a single credential.
-  # The raw secret value is read at runtime and exported as envVar.
-  # Servers with one credential use this as `credentials`, servers with
-  # multiple credentials use distinct option names (e.g., credentials,
-  # openaiCredentials) — each mapping to one env var.
+  # Creates a discriminated union (attrTag) option for a single credential.
+  # Exactly one of `file` or `helper` may be set; the type system enforces
+  # mutual exclusion (no runtime assertion needed). Wrapped in nullOr so
+  # optional credentials default to null.
   mkCredentialsOption = envVar:
     mkOption {
-      type = types.submodule {
-        options = {
-          file = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = ''
-              Path to a file containing the raw secret value, read at runtime.
-              Not stored in the Nix store. Works with sops-nix, agenix, or any
-              tool that decrypts secrets to files. Mapped to ${envVar}.
-            '';
-          };
-          helper = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = ''
-              Path to an executable that outputs the raw secret value on stdout.
-              Executed at service start. Mapped to ${envVar}.
-            '';
-          };
+      type = types.nullOr (types.attrTag {
+        file = mkOption {
+          type = types.str;
+          description = ''
+            Path to a file containing the raw secret value, read at runtime.
+            Not stored in the Nix store. Works with sops-nix, agenix, or any
+            tool that decrypts secrets to files. Mapped to ${envVar}.
+          '';
         };
-      };
-      default = {};
-      description = "Credential mapped to ${envVar}.";
+        helper = mkOption {
+          type = types.str;
+          description = ''
+            Path to an executable that outputs the raw secret value on stdout.
+            Executed at service start. Mapped to ${envVar}.
+          '';
+        };
+      });
+      default = null;
+      description = "Credential mapped to ${envVar}. Set exactly one of file or helper.";
     };
 
   # ── Credentials helpers ──────────────────────────────────────────

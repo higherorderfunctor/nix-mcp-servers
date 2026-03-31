@@ -233,27 +233,16 @@ in {
     };
 
     assertions = let
-      # Generate credential assertions for all enabled servers
+      # Credential assertions: mutual exclusion is enforced by types.attrTag,
+      # only required-credential checks remain.
       credAssertions = lib.concatLists (mapAttrsToList (name: srv: let
         serverDef = serverFiles.${name};
         credVars = serverDef.meta.credentialVars or {};
         evaluatedSettings = mcpLib.evalSettings name srv.settings;
       in
-        lib.concatLists (mapAttrsToList (optName: spec: let
-          cred = evaluatedSettings.${optName};
-          hasFile = (cred.file or null) != null;
-          hasHelper = (cred.helper or null) != null;
-        in
-          # Mutual exclusion: file and helper cannot both be set
-          [
-            {
-              assertion = !(hasFile && hasHelper);
-              message = "services.mcp-servers.servers.${name}.settings.${optName}: set either file or helper, not both";
-            }
-          ]
-          # Required: must have file or helper
-          ++ lib.optional spec.required {
-            assertion = hasFile || hasHelper;
+        lib.concatLists (mapAttrsToList (optName: spec:
+          lib.optional spec.required {
+            assertion = evaluatedSettings.${optName} != null;
             message = "services.mcp-servers.servers.${name}.settings.${optName}: credentials are required (set file or helper)";
           })
         credVars))
